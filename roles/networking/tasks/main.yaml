@@ -1,0 +1,68 @@
+---
+- name: Install wireguard
+  ansible.builtin.apt:
+    name:
+      - wireguard
+    state: present
+
+- name: Create wireguard keys
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail #
+      wg genkey | (umask 0077 && tee {{ networking_wireguard_private_key_file }}) | wg pubkey > {{ networking_wireguard_public_key_file }}
+    executable: /bin/bash
+  args:
+    creates: "{{ networking_wireguard_private_key_file }}"
+
+- name: Create wireguard preshared key
+  ansible.builtin.shell:
+    cmd: "umask 0077 && wg genpsk > {{ networking_wireguard_preshared_key_file }}"
+  args:
+    creates: "{{ networking_wireguard_preshared_key_file }}"
+
+- name: Change key file owners to systtemd-network
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: systemd-network
+    group: systemd-network
+  with_items:
+    - "/etc/wireguard"
+    - "{{ networking_wireguard_private_key_file }}"
+    - "{{ networking_wireguard_public_key_file }}"
+    - "{{ networking_wireguard_preshared_key_file }}"
+
+- name: Configure network interfaces
+  ansible.builtin.include_role:
+    name: ansible_systemd
+  vars:
+    # noqa: var-naming[no-role-prefix]
+    systemd_network_networks:
+      enp5s0:
+        Network:
+          DHCP: true
+      wg0:
+        Network:
+          Address:
+            - "10.0.0.2/24"
+            - "fdbd:2a35:2f10::2/64"
+
+    systemd_network_netdevs:
+      wg0:
+        NetDev:
+          Kind: wireguard
+          Description: WireGuard tunnel
+        WireGuard:
+          PrivateKeyFile: "{{ networking_wireguard_private_key_file }}"
+          ListenPort: 51902
+        WireGuardPeer:
+          - PublicKey: "{{ networking_wireguard_peer.publickey }}"
+            AllowedIPs: "{{ networking_wireguard_peer.allowedips }}"
+            Endpoint: "{{ networking_wireguard_peer.endpoint }}"
+            PresharedKeyFile: "{{ networking_wireguard_preshared_key_file }}"
+
+- name: Create proxy network
+  community.docker.docker_network:
+    name: "{{ docker_proxy_network }}"
+    state: present
+    driver: bridge
+    enable_ipv6: true

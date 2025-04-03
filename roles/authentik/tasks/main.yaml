@@ -1,0 +1,40 @@
+- name: Create authentik base folder
+  ansible.builtin.file:
+    name: "{{ authentik_base_folder }}"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: "0750"
+
+- name: Create authentik data folders
+  ansible.builtin.file:
+    name: "{{ item }}"
+    state: directory
+    owner: 1000
+    group: 1000
+    mode: "0750"
+  with_items:
+    - "{{ authentik_base_folder }}/data/authentik/media"
+    - "{{ authentik_base_folder }}/data/authentik/certs"
+    - "{{ authentik_base_folder }}/data/authentik/templates"
+    - "{{ authentik_base_folder }}/data/authentik/custom-templates"
+
+- name: Create authentik database folder
+  ansible.builtin.file:
+    name: "{{ authentik_base_folder }}/data/postgresql"
+    state: directory
+    owner: 70
+    group: 70
+    mode: "0750"
+
+- name: Create authentik files from templates
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ authentik_base_folder }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
+    mode: "0640"
+  with_items:
+    - "compose.yaml.j2"
+    - "authentik.env.j2"
+    - "postgres.env.j2"
+  notify:
+    - authentik-recreate

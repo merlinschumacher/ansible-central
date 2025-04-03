@@ -1,0 +1,43 @@
+---
+source: journalctl
+journalctl_filter:
+  - "_TRANSPORT=journal"
+labels:
+  type: syslog
+---
+source: journalctl
+journalctl_filter:
+  - "_TRANSPORT=syslog"
+labels:
+  type: syslog
+---
+source: journalctl
+journalctl_filter:
+  - "_TRANSPORT=stdout"
+labels:
+  type: syslog
+---
+source: journalctl
+journalctl_filter:
+  - "_TRANSPORT=kernel"
+labels:
+  type: syslog
+---
+filenames:
+  - /logs/traefik/*.log
+labels:
+  type: traefik
+---
+listen_addr: 0.0.0.0:7422
+appsec_config: crowdsecurity/appsec-default
+name: myAppSecComponent
+source: appsec
+labels:
+  type: appsec
+---
+source: docker
+container_name:
+ - authentik-server-*
+ - authentik-worker-*
+labels:
+  type: authentik

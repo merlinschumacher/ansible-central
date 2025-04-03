@@ -1,0 +1,77 @@
+---
+- name: Central Setup
+  hosts: myhosts
+  become: true
+  vars:
+    docker_base_folder: /docker
+    docker_proxy_network: "proxy"
+    docker_traefik_https_endpoint: "websecure"
+    docker_traefik_auth_middleware: "proxyauth"
+    authentik_docker_tag: "2025.2.3"
+
+  roles:
+    - role: hifis.toolkit.unattended_upgrades
+      tags:
+        - never
+        - system-configuration
+    - role: idiv_biodiversity.systemd.systemd_timesyncd
+      tags:
+        - never
+        - system-configuration
+      vars:
+        systemd_timesyncd_ntp_servers:
+          - 0.de.pool.ntp.org
+          - 1.de.pool.ntp.org
+          - 2.de.pool.ntp.org
+          - 3.de.pool.ntp.org
+        systemd_timesyncd_remove_legacy_packages: true
+    - role: geerlingguy.docker
+      tags:
+        - never
+        - system-configuration
+    - role: networking
+      tags:
+        - never
+        - networking
+        - system-configuration
+    - role: authentik
+      tags:
+        - services
+        - authentik
+    - role: crowdsec
+      tags:
+        - services
+        - crowdsec
+    - role: traefik
+      tags:
+        - services
+        - traefik
+    # - role: portainer
+    #  tags:
+    #    - services
+    #    - portainer
+  pre_tasks:
+    - name: Install base packages
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - python3-yaml
+        state: present
+      tags:
+        - never
+        - system-configuration
+
+    - name: Create docker data folder
+      ansible.builtin.file:
+        path: /docker/
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      tags:
+        - never
+        - system-configuration

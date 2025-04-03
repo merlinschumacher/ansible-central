@@ -1,0 +1,27 @@
+---
+crowdsec_base_folder: "{{ docker_base_folder }}/crowdsec"
+crowdsec_gid: 1001
+crowdsec_collections_list:
+  - crowdsecurity/sshd
+  - crowdsecurity/sshd-impossible-travel
+  - crowdsecurity/linux
+  - crowdsecurity/linux-lpe
+  - crowdsecurity/traefik
+  - crowdsecurity/http-cve
+  - crowdsecurity/base-http-scenarios
+  - crowdsecurity/nginx
+  - crowdsecurity/appsec-virtual-patching
+  - crowdsecurity/appsec-generic-rules
+  - crowdsecurity/appsec-crs
+  - crowdsecurity/postfix
+  - crowdsecurity/dovecot
+  - crowdsecurity/wordpress
+  - crowdsecurity/appsec-wordpress
+  - crowdsecurity/apache2
+  - crowdsecurity/mysql
+  - crowdsecurity/pgsql
+  - crowdsecurity/whitelist-good-actors
+  - Dominic-Wagner/vaultwarden
+  - timokoessler/uptime-kuma
+  - LePresidente/gitea
+  - firix/authentik

@@ -1,0 +1,28 @@
+{
+  "name": "ansible-dev-container-docker",
+  "image": "ghcr.io/ansible/community-ansible-dev-tools:latest",
+  "containerUser": "root",
+  "runArgs": [
+    "--privileged",
+    "--device",
+    "/dev/fuse",
+    "--hostname=ansible-dev-container"
+  ],
+  "updateRemoteUserUID": true,
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "redhat.ansible",
+        "redhat.vscode-yaml",
+        "redhat.vscode-xml",
+        "ms-azuretools.vscode-docker",
+        "foxundermoon.shell-format",
+        "tamasfe.even-better-toml",
+        "samuelcolvin.jinjahtml"
+      ]
+    }
+  },
+  "features": {
+    "ghcr.io/stuartleeks/dev-container-features/shell-history:0": {}
+  }
+}

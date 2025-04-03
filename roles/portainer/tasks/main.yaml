@@ -1,0 +1,47 @@
+---
+- name: Create Portainer data folder
+  ansible.builtin.file:
+    name: "{{ portainer_base_folder }}/data"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+    force: false
+
+- name: Create portainer container
+  community.docker.docker_compose_v2:
+    state: "present"
+    recreate: "always"
+    project_name: "portainer"
+    definition:
+      services:
+        portainer:
+          image: portainer/portainer-ee:lts
+          restart: always
+          networks:
+            - default
+            - "{{ docker_proxy_network }}"
+          volumes:
+            - /:/host
+            - "{{ portainer_base_folder }}/data:/data/portainer"
+          labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.portainer.rule=Host(`portainer.{{ ansible_domain }}`)"
+            - "traefik.http.routers.portainer.entrypoints={{ docker_traefik_https_endpoint }}"
+            - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+            - "traefik.http.routers.portainer.service=portainer"
+
+        portainer_agent:
+          image: portainer/agent
+          restart: always
+          networks:
+            - default
+          volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /var/lib/docker/volumes:/var/lib/docker/volumes
+            - /:/host
+
+      networks:
+        proxy:
+          external: true
+          enable_ipv6: true

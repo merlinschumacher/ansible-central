@@ -1,0 +1,7 @@
+---
+- name: Create traefik container
+  community.docker.docker_compose_v2:
+    project_src: "{{ traefik_base_folder }}"
+    state: present
+    recreate: "always"
+  listen: traefik-recreate

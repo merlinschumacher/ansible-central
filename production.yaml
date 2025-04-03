@@ -1,0 +1,7 @@
+---
+myhosts:
+  hosts:
+    central:
+      ansible_host: central.msch.cc
+      ansible_port: 10022
+      ansible_user: merlin

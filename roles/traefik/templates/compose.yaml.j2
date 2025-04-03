@@ -1,0 +1,27 @@
+---
+services:
+  proxy:
+    image: traefik:v3
+    container_name: proxy
+    restart: always
+    networks:
+      - default
+      - {{ docker_proxy_network }}
+    ports:
+      - "{{ external_ipv4 }}:53:53/udp"
+      - "{{ external_ipv6 }}:53:53/udp"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ traefik_base_folder }}/data:/etc/traefik"
+      - "{{ traefik_base_folder }}/data/logs:/var/log/traefik"
+    env_file:
+      - "{{ traefik_base_folder }}/traefik.env"
+    labels:
+      - {{ docker_label_enable_watchtower }}
+
+networks:
+  {{ docker_proxy_network }}:
+    external: true
+

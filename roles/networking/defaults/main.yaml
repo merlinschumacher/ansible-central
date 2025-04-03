@@ -1,0 +1,5 @@
+---
+networking_wireguard_configuration_directory: /etc/wireguard
+networking_wireguard_private_key_file: "{{ networking_wireguard_configuration_directory }}/{{ ansible_hostname }}.key"
+networking_wireguard_public_key_file: "{{ networking_wireguard_configuration_directory }}/{{ ansible_hostname }}.pub"
+networking_wireguard_preshared_key_file: "{{ networking_wireguard_configuration_directory }}/{{ ansible_hostname }}.psk"

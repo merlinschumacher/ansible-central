@@ -1,0 +1,12 @@
+---
+external_ipv4: 192.168.178.23
+external_ipv6: fd00:464e:6dff:fe53:7285:c2ff:fe93:31b2
+traefik_cf_email: merlin.schumacher@gmail.com
+networking_wireguard_peer:
+    publickey: 8Co5YSeDH7355ZcdkKiNqBg8Ejhe+ZzF7PY9cByHF08=
+    allowedips: "10.0.0.1/32, fdbd:2a35:2f10::1,128"
+    endpoint: "mail.merlinschumacher.de:51871"
+mailserver_hostname: mail.merlinschumacher.de
+mailserver_domain: merlinschumacher.de
+mailserver_port: 465
+mailserver_username: notifications@merlinschumacher.de

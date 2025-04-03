@@ -1,0 +1,75 @@
+---
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - debian-archive-keyring
+      - apt-transport-https
+      - curl
+      - gnupg
+    state: present
+
+- name: Add repo using key from URL
+  ansible.builtin.deb822_repository:
+    name: crowdsec
+    types: deb
+    uris: "https://packagecloud.io/crowdsec/crowdsec/debian"
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: amd64
+    signed_by: "https://packagecloud.io/crowdsec/crowdsec/gpgkey"
+    state: present
+  register: apt_repo_add
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  when: apt_repo_add.changed # noqa: no-handler
+
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - crowdsec-firewall-bouncer-iptables
+    state: present
+
+- name: Create crowdsec database folder
+  ansible.builtin.file:
+    name: "{{ crowdsec_base_folder }}/data/db"
+    state: directory
+    owner: 1000
+    group: "{{ crowdsec_gid }}"
+    mode: "0750"
+
+- name: Create crowdsec config folder
+  ansible.builtin.file:
+    name: "{{ crowdsec_base_folder }}/data/config"
+    state: directory
+    owner: 1000
+    group: "{{ crowdsec_gid }}"
+    mode: "0750"
+
+- name: Concatenate a list to string
+  ansible.builtin.set_fact:
+    crowdsec_collections: "{{ crowdsec_collections_list | join(' ') }}"
+
+- name: Create crowdsec files from templates
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ crowdsec_base_folder }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
+    mode: "0640"
+  with_items:
+    - "crowdsec.env.j2"
+    - "compose.yaml.j2"
+  notify:
+    - crowdsec-recreate
+
+- name: Copy crowdsec config files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ crowdsec_base_folder }}/data/config/{{ item | basename }}"
+    mode: "0640"
+  with_items:
+    - "acquis.yaml"
+    - "appsec.yaml"
+    - "config.yaml.local"
+  notify:
+    - crowdsec-recreate

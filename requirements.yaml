@@ -1,0 +1,10 @@
+---
+roles:
+  - geerlingguy.docker
+  - git+https://github.com/stuvusIT/ansible_systemd.git
+
+collections:
+  - community.general
+  - community.docker
+  - idiv_biodiversity.systemd
+  - hifis.toolkit
