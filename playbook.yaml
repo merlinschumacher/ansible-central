@@ -5,9 +5,20 @@
   vars:
     docker_base_folder: /docker
     docker_proxy_network: "proxy"
-    docker_traefik_https_endpoint: "websecure"
+    docker_traefik_https_endpoint: "web-secure"
     docker_traefik_auth_middleware: "proxyauth"
-    authentik_docker_tag: "2025.2.3"
+    docker_traefik_lan_middleware: "lan-whitelist"
+    authentik_docker_tag: "2025.2"
+    borgwarehouse_ssh_port: 11022
+    mosquitto_mqtt_port: 1883
+    mosquitto_mqttsecure_port: 8883
+    traefik_additional_entrypoints:
+      borgwarehousessh:
+        address: ":{{ borgwarehouse_ssh_port }}"
+      mqtt:
+        address: ":{{ mosquitto_mqtt_port }}"
+      mqttsecure:
+        address: ":{{ mosquitto_mqttsecure_port }}"
 
   roles:
     - role: hifis.toolkit.unattended_upgrades
@@ -46,6 +57,10 @@
       tags:
         - services
         - traefik
+    - role: borgwarehouse
+      tags:
+        - services
+        - borgwarehouse
     # - role: portainer
     #  tags:
     #    - services

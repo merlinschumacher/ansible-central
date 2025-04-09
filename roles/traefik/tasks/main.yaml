@@ -22,7 +22,7 @@
 - name: Create traefik config files from template
   ansible.builtin.template:
     src: "{{ item }}"
-    dest: "{{ traefik_base_folder }}/data/{{ item | basename | regex_replace('\\.j2$', '') }}"
+    dest: "{{ traefik_base_folder }}/data/config/{{ item | basename | regex_replace('\\.j2$', '') }}"
     mode: "0640"
   with_items:
     - "traefik.yaml.j2"

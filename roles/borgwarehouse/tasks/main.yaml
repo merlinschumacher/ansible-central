@@ -1,0 +1,29 @@
+- name: Create borgwarehouse folders
+  ansible.builtin.file:
+    name: "{{ borgwarehouse_base_folder }}/{{ item }}"
+    state: directory
+    owner: "1001"
+    group: "1001"
+    mode: "0750"
+    force: false
+  with_items:
+    - "data"
+    - "data/config"
+    - "data/dot-ssh"
+    - "data/ssh"
+    - "data/repos"
+    - "data/tmp"
+    - "data/logs"
+  notify:
+    - borgwarehouse-recreate
+
+- name: Create borgwarehouse compose file from template
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ borgwarehouse_base_folder }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
+    mode: "0640"
+  with_items:
+    - "compose.yaml.j2"
+    - "borgwarehouse.env.j2"
+  notify:
+    - borgwarehouse-recreate

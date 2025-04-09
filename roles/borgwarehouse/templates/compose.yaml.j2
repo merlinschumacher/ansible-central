@@ -1,0 +1,32 @@
+---
+services:
+  borgwarehouse:
+    container_name: borgwarehouse
+    image: borgwarehouse/borgwarehouse
+    user: "{{ borgwarehouse_uid }}:{{ borgwarehouse_gid }}"
+    restart: always
+    networks:
+      - {{ docker_proxy_network }}
+    volumes:
+      - {{ borgwarehouse_base_folder }}/data/config:/home/borgwarehouse/app/config
+      - {{ borgwarehouse_base_folder }}/data/dot-ssh:/home/borgwarehouse/.ssh
+      - {{ borgwarehouse_base_folder }}/data/ssh:/etc/ssh
+      - {{ borgwarehouse_base_folder }}/data/repos:/home/borgwarehouse/repos
+      - {{ borgwarehouse_base_folder }}/data/tmp:/home/borgwarehouse/tmp
+      - {{ borgwarehouse_base_folder }}/data/logs:/home/borgwarehouse/logs
+    env_file: "{{ borgwarehouse_base_folder }}/borgwarehouse.env"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.borgwarehouse.rule=(Host(`backup.msch.cc`))
+      - traefik.http.services.borgwarehouse.loadbalancer.server.port=3000
+      - traefik.http.routers.borgwarehouse.entrypoints={{ docker_traefik_https_endpoint }}
+      - traefik.http.routers.borgwarehouse.service=borgwarehouse
+      - traefik.http.routers.borgwarehouse.middlewares={{ docker_traefik_lan_middleware }}
+      - traefik.tcp.routers.borgwarehousessh.service=borgwarehousessh
+      - traefik.tcp.services.borgwarehousessh.loadbalancer.server.port=22
+      - traefik.tcp.routers.borgwarehousessh.entrypoints=borgwarehousessh
+
+networks:
+  {{ docker_proxy_network }}:
+    external: true
+

@@ -19,6 +19,13 @@ accessLog:
       names:
           User-Agent: keep # log user agent strings
 
+metrics:
+  influxDB2:
+    address: http://localhost:8086
+    org: merlinschumacher.de
+    bucket: traefik
+    token: {{ traefik_influxdb_token }}
+
 log:
   level: INFO
 
@@ -44,6 +51,7 @@ entryPoints:
             sans:
               - "{{ ansible_domain }}"
               - "*.merlinschumacher.de"
+  {{ traefik_additional_entrypoints | to_nice_yaml(indent=2) | indent(2) }}
 
 providers:
   docker:

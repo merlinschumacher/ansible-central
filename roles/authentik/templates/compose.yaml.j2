@@ -58,13 +58,6 @@ services:
     image: {{ authentik_docker_image }}:{{ authentik_docker_tag }}
     restart: unless-stopped
     command: worker
-    # `user: root` and the docker socket volume are optional.
-    # See more for the docker socket integration here:
-    # https://goauthentik.io/docs/outposts/integrations/docker
-    # Removing `user: root` also prevents the worker from fixing the permissions
-    # on the mounted folders, so when removing this make sure the folders have the correct UID/GID
-    # (1000:1000 by default)
-    user: root
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - {{ authentik_base_folder }}/data/authentik/media:/media
@@ -85,7 +78,5 @@ volumes:
     external: true
 
 networks:
-  default:
   {{ docker_proxy_network }}:
-    enable_ipv6: true
     external: true

@@ -27,6 +27,11 @@
     group: 70
     mode: "0750"
 
+- name: Create certs volume
+  community.docker.docker_volume:
+    name: certs
+    state: present
+
 - name: Create authentik files from templates
   ansible.builtin.template:
     src: "{{ item }}"

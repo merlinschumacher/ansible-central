@@ -1,0 +1,8 @@
+---
+borgwarehouse_base_folder: "{{ docker_base_folder }}/borgwarehouse"
+borgwarehouse_email_port: "{{ mailserver_port }}"
+borgwarehouse_email_host: "{{ mailserver_hostname }}"
+borgwarehouse_email_username: "notifications@{{ mailserver_domain }}"
+borgwarehouse_email_from: "BorgWarehouse"
+borgwarehouse_uid: 1001
+borgwarehouse_gid: 1001

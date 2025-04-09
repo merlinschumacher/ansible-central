@@ -5,6 +5,12 @@ http:
     https-redirect:
       redirectScheme:
         scheme: https
+    {{ docker_traefik_lan_middleware }}:
+      ipAllowList:
+        sourceRange:
+          - "127.0.0.1/32"
+          - "192.168.178.0/24"
+          - "fd00:464e:6dff:fe53::/64"
     crowdsec-bouncer:
         plugin:
             crowdsec-bouncer-traefik-plugin:
