@@ -9,3 +9,4 @@ networking_wireguard_peer:
 mailserver_hostname: mail.merlinschumacher.de
 mailserver_port: 465
 mailserver_username: notifications@merlinschumacher.de
+borgwarehouse_repo_folder: "/srv/media3/backup/"

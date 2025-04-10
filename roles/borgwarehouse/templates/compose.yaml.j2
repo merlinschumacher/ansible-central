@@ -11,7 +11,7 @@ services:
       - {{ borgwarehouse_base_folder }}/data/config:/home/borgwarehouse/app/config
       - {{ borgwarehouse_base_folder }}/data/dot-ssh:/home/borgwarehouse/.ssh
       - {{ borgwarehouse_base_folder }}/data/ssh:/etc/ssh
-      - {{ borgwarehouse_base_folder }}/data/repos:/home/borgwarehouse/repos
+      - {{ borgwarehouse_repo_folder }}:/home/borgwarehouse/repos
       - {{ borgwarehouse_base_folder }}/data/tmp:/home/borgwarehouse/tmp
       - {{ borgwarehouse_base_folder }}/data/logs:/home/borgwarehouse/logs
     env_file: "{{ borgwarehouse_base_folder }}/borgwarehouse.env"
@@ -22,6 +22,7 @@ services:
       - traefik.http.routers.borgwarehouse.entrypoints={{ docker_traefik_https_endpoint }}
       - traefik.http.routers.borgwarehouse.service=borgwarehouse
       - traefik.http.routers.borgwarehouse.middlewares={{ docker_traefik_lan_middleware }}
+      - traefik.tcp.routers.borgwarehousessh.rule=HostSNI(`*`)
       - traefik.tcp.routers.borgwarehousessh.service=borgwarehousessh
       - traefik.tcp.services.borgwarehousessh.loadbalancer.server.port=22
       - traefik.tcp.routers.borgwarehousessh.entrypoints=borgwarehousessh

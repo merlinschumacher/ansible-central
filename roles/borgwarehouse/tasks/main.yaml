@@ -9,11 +9,22 @@
   with_items:
     - "data"
     - "data/config"
-    - "data/dot-ssh"
     - "data/ssh"
-    - "data/repos"
     - "data/tmp"
     - "data/logs"
+  notify:
+    - borgwarehouse-recreate
+
+- name: Create borgwarehouse folders
+  ansible.builtin.file:
+    name: "{{ borgwarehouse_base_folder }}/{{ item }}"
+    state: directory
+    owner: "1001"
+    group: "1001"
+    mode: "0700"
+    force: false
+  with_items:
+    - "data/dot-ssh"
   notify:
     - borgwarehouse-recreate
 
@@ -27,3 +38,14 @@
     - "borgwarehouse.env.j2"
   notify:
     - borgwarehouse-recreate
+
+- name: Creates a cron job for borgwarehouse
+  ansible.builtin.cron:
+    name: "borgwarehouse"
+    minute: "*/30"
+    user: "nobody"
+    job: "curl --request POST --url 'https://backup.{{ ansible_domain }}/api/cronjob/checkStatus' \
+     --header 'Authorization: Bearer {{ borgwarehouse_cronjob_key }}'; \
+     curl --request POST --url 'https://backup.{{ ansible_domain }}/api/cronjob/getStorageUsed' \
+     --header 'Authorization: Bearer {{ borgwarehouse_cronjob_key }}'"
+    cron_file: borgwarehouse
