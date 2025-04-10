@@ -5,8 +5,9 @@ services:
     container_name: proxy
     restart: always
     networks:
-      - default
-      - {{ docker_proxy_network }}
+      {{ docker_proxy_network }}:
+        ipv4_address: "172.18.0.3"
+        ipv6_address: "fd3c:3065:744::3"
     ports:
       - "80:80"
       - "443:443"

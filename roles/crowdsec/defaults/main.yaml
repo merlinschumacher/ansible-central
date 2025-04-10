@@ -23,5 +23,4 @@ crowdsec_collections_list:
   - crowdsecurity/whitelist-good-actors
   - Dominic-Wagner/vaultwarden
   - timokoessler/uptime-kuma
-  - LePresidente/gitea
   - firix/authentik

@@ -6,5 +6,5 @@ authentik_docker_image: "ghcr.io/goauthentik/server"
 authentik_error_reporting_enabled: false
 authentik_email_port: "{{ mailserver_port }}"
 authentik_email_host: "{{ mailserver_hostname }}"
-authentik_email_username: "notifications@{{ mailserver_domain }}"
+authentik_email_username: "{{ mailserver_username }}"
 authentik_email_from: "Authentik"

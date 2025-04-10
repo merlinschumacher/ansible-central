@@ -7,7 +7,7 @@
     docker_proxy_network: "proxy"
     docker_traefik_https_endpoint: "web-secure"
     docker_traefik_auth_middleware: "proxyauth"
-    docker_traefik_lan_middleware: "lan-whitelist"
+    docker_traefik_lan_middleware: "lan-whitelist@file"
     authentik_docker_tag: "2025.2"
     borgwarehouse_ssh_port: 11022
     mosquitto_mqtt_port: 1883

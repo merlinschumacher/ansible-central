@@ -7,7 +7,9 @@ services:
     ports:
       - "127.0.0.1:8080:8080"
     networks:
-      - proxy
+      {{ docker_proxy_network }}:
+        ipv4_address: "172.18.0.2"
+        ipv6_address: "fd3c:3065:744::2"
     env_file:
       - "{{ crowdsec_base_folder }}/crowdsec.env"
     volumes:

@@ -7,6 +7,5 @@ networking_wireguard_peer:
     allowedips: "10.0.0.1/32, fdbd:2a35:2f10::1,128"
     endpoint: "mail.merlinschumacher.de:51871"
 mailserver_hostname: mail.merlinschumacher.de
-mailserver_domain: merlinschumacher.de
 mailserver_port: 465
 mailserver_username: notifications@merlinschumacher.de

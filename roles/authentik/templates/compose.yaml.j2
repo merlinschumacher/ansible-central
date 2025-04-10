@@ -34,8 +34,10 @@ services:
       - {{ authentik_base_folder }}/data/authentik/templates:/templates
       - certs:/certs:ro
     networks:
-      - default
-      - {{ docker_proxy_network }}
+      default:
+      {{ docker_proxy_network }}:
+        ipv4_address: "172.18.0.4"
+        ipv6_address: "fd3c:3065:744::4"
     env_file: "{{ authentik_base_folder }}/authentik.env"
     labels:
       - traefik.enable=true
@@ -65,7 +67,6 @@ services:
       - certs:/certs
     networks:
       - default
-      - {{ docker_proxy_network }}
     env_file: "{{ authentik_base_folder }}/authentik.env"
     depends_on:
       postgresql:
