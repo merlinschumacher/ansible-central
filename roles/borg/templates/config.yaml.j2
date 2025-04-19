@@ -1,0 +1,66 @@
+# Where to look for files to backup, and where to store those backups.
+# See https://borgbackup.readthedocs.io/en/stable/quickstart.html and
+# https://borgbackup.readthedocs.io/en/stable/usage/create.html
+# for details.
+location:
+    # List of source directories to backup. Globs and tildes are
+    # expanded. Do not backslash spaces in path names.
+    source_directories:
+        - /root
+        - /home
+        - /etc
+        - /{{ docker_base_folder }}/*/data/
+
+    repositories:
+        # Paths of local or remote repositories to backup to.
+        - {{ borg_backup_repository }}
+    patterns:
+        - '- **/*.pyc'
+        - '! /home/*/.cache'
+        - '! /root/.cache'
+        - '- **/*.vim*.tmp'
+        - '! /etc/ssl'
+        - '- /{{ docker_base_folder }}/traefik/**/acme.json'
+        - '! /{{ docker_base_folder }}/**/cache/'
+        - '! /{{ docker_base_folder }}/**/logs/'
+        - '! /{{ docker_base_folder }}/crowdsec'
+        - '! /{{ docker_base_folder }}/immich/data/model-cache'
+        - '! /{{ docker_base_folder }}/smart-home/data/esphome/.esphome'
+        - '! /{{ docker_base_folder }}/smart-home/data/hass/**/backups'
+        - '! /{{ docker_base_folder }}/smart-home/data/hass/tts'
+        - '! /{{ docker_base_folder }}/smart-home/data/zigbee/log'
+        - '! /{{ docker_base_folder }}/transmission/**/Backups'
+        - '! /{{ docker_base_folder }}/transmission/**/MediaCover'
+        - '! /{{ docker_base_folder }}/borgwarehouse/'
+        - '! /{{ docker_base_folder }}/samba/'
+        - '! /etc/.git'
+        - '! re:^(dev|proc|run|sys|tmp)'
+
+storage:
+    archive_name_format: '{fqdn}-documents-{now}'
+    encryption_passphrase: "{{ borg_encryption_passphrase }}"
+
+retention:
+    # Retention policy for how many backups to keep.
+    keep_daily: 7
+    keep_weekly: 4
+    keep_monthly: 6
+
+consistency:
+    # List of checks to run to validate your backups.
+    checks:
+        - name: repository
+        - name: archives
+          frequency: 2 weeks
+
+#hooks:
+    # Custom preparation scripts to run.
+    #before_backup:
+    #   - prepare-for-backup.sh
+
+    # Databases to dump and include in backups.
+    #postgresql_databases:
+    #   - name: users
+
+    # Third-party services to notify you if backups aren't happening.
+    #healthchecks: https://hc-ping.com/be067061-cf96-4412-8eae-62b0c50d6a8c

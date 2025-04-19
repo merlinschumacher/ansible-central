@@ -12,6 +12,7 @@
     borgwarehouse_ssh_port: 11022
     mosquitto_mqtt_port: 1883
     mosquitto_mqttsecure_port: 8883
+    borg_backup_repository: "ssh://borgwarehouse@backup.msch.cc:11022/./ca807104"
     traefik_additional_entrypoints:
       borgwarehousessh:
         address: ":{{ borgwarehouse_ssh_port }}"
@@ -61,6 +62,12 @@
       tags:
         - services
         - borgwarehouse
+        - backup
+    - role: borg
+      tags:
+        - services
+        - borg
+        - backup
     # - role: portainer
     #  tags:
     #    - services

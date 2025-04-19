@@ -1,0 +1,34 @@
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - borgbackup
+      - borgmatic
+    state: present
+
+- name: Create a SSH key for user root
+  ansible.builtin.user:
+    name: root
+    generate_ssh_key: true
+    ssh_key_file: .ssh/id_ed25519
+
+- name: Create borgmatic config folder
+  ansible.builtin.file:
+    name: "/etc/borgmatic"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Create borgmatic config from template
+  ansible.builtin.template:
+    src: "config.yaml.j2"
+    dest: "/etc/borgmatic/config.yaml"
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Enable borgmatic timer
+  ansible.builtin.systemd:
+    name: borgmatic.timer
+    enabled: true
+    state: started
