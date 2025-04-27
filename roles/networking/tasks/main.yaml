@@ -69,3 +69,13 @@
     ipam_config:
       - subnet: 172.18.0.0/16
       - subnet: fd3c:3065:744::/64
+
+- name: Create proxy security network
+  community.docker.docker_network:
+    name: "{{ docker_proxy_security_network }}"
+    state: present
+    driver: bridge
+    enable_ipv6: true
+    ipam_config:
+      - subnet: 172.30.0.0/16
+      - subnet: fd3c:3065:745::/64

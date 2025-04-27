@@ -6,8 +6,9 @@ services:
     restart: always
     networks:
       {{ docker_proxy_network }}:
-        ipv4_address: "172.18.0.3"
-        ipv6_address: "fd3c:3065:744::3"
+      {{ docker_proxy_security_network }}:
+        ipv4_address: "172.30.0.3"
+        ipv6_address: "fd3c:3065:745::3"
     ports:
       - "80:80"
       - "443:443"
@@ -23,5 +24,7 @@ services:
 
 networks:
   {{ docker_proxy_network }}:
+    external: true
+  {{ docker_proxy_security_network }}:
     external: true
 

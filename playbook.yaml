@@ -5,6 +5,7 @@
   vars:
     docker_base_folder: /docker
     docker_proxy_network: "proxy"
+    docker_proxy_security_network: "proxysec"
     docker_traefik_https_endpoint: "web-secure"
     docker_traefik_auth_middleware: "proxyauth"
     docker_traefik_lan_middleware: "lan-whitelist@file"

@@ -1,6 +1,6 @@
 ---
-external_ipv4: 192.168.178.23
-external_ipv6: fd00:464e:6dff:fe53:7285:c2ff:fe93:31b2
+external_ipv4: 10.138.1.10
+external_ipv6: "fe80::7285:c2ff:fe93:31b2"
 traefik_cf_email: merlin.schumacher@gmail.com
 networking_wireguard_peer:
     publickey: 8Co5YSeDH7355ZcdkKiNqBg8Ejhe+ZzF7PY9cByHF08=

@@ -2,7 +2,7 @@
 services:
   postgresql:
     image: docker.io/library/postgres:16-alpine
-    restart: unless-stopped
+    restart: always
     env_file: "{{ authentik_base_folder }}/postgres.env"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
@@ -15,7 +15,7 @@ services:
   redis:
     image: docker.io/library/redis:alpine
     command: --save 60 1 --loglevel warning
-    restart: unless-stopped
+    restart: always
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       start_period: 20s
@@ -26,8 +26,7 @@ services:
       - {{ authentik_base_folder }}/data/redis:/data
   server:
     image: {{ authentik_docker_image }}:{{ authentik_docker_tag }}
-    restart: unless-stopped
-    container_name: authentik-server
+    restart: always
     command: server
     volumes:
       - {{ authentik_base_folder }}/data/authentik/media:/media
@@ -36,8 +35,9 @@ services:
     networks:
       default:
       {{ docker_proxy_network }}:
-        ipv4_address: "172.18.0.4"
-        ipv6_address: "fd3c:3065:744::4"
+      {{ docker_proxy_security_network }}:
+        ipv4_address: "172.30.0.4"
+        ipv6_address: "fd3c:3065:745::4"
     env_file: "{{ authentik_base_folder }}/authentik.env"
     labels:
       - traefik.enable=true
@@ -58,7 +58,7 @@ services:
 
   worker:
     image: {{ authentik_docker_image }}:{{ authentik_docker_tag }}
-    restart: unless-stopped
+    restart: always
     command: worker
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -80,4 +80,6 @@ volumes:
 
 networks:
   {{ docker_proxy_network }}:
+    external: true
+  {{ docker_proxy_security_network }}:
     external: true
