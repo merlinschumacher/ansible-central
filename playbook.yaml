@@ -69,6 +69,10 @@
         - services
         - borg
         - backup
+    - role: jellyfin
+      tags:
+        - services
+        - jellyfin
     # - role: portainer
     #  tags:
     #    - services
