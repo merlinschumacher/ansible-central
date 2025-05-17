@@ -18,6 +18,9 @@ services:
       - /srv/media3/Filme:/movies
     env_file:
       - {{ jellyfin_base_folder }}/jellyfin.env
+    networks:
+      - default
+      - {{ docker_proxy_network }}
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.jellyfin.entryPoints={{ docker_traefik_https_endpoint }}'
@@ -38,3 +41,18 @@ services:
       - 'traefik.http.routers.jellyfin.service=jellyfin-svc'
       - 'traefik.http.services.jellyfin-svc.loadBalancer.server.port=8096'
       - 'traefik.http.services.jellyfin-svc.loadBalancer.passHostHeader=true'
+
+  jellyplex-watched:
+    user: 1000:1000
+    image: luigi311/jellyplex-watched:latest
+    container_name: jellyplex-watched
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+    env_file: jellyplex-watched.env
+
+networks:
+  default:
+  {{ docker_proxy_network }}:
+    external: true
