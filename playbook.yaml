@@ -47,6 +47,12 @@
         - never
         - networking
         - system-configuration
+    - role: mivek.inadyn
+      tags:
+        - never
+        - inadyn
+        - networking
+        - system-configuration
     - role: authentik
       tags:
         - services

@@ -3,10 +3,28 @@ external_ipv4: 10.138.1.10
 external_ipv6: "fe80::7285:c2ff:fe93:31b2"
 traefik_cf_email: merlin.schumacher@gmail.com
 networking_wireguard_peer:
-    publickey: 8Co5YSeDH7355ZcdkKiNqBg8Ejhe+ZzF7PY9cByHF08=
-    allowedips: "10.0.0.1/32, fdbd:2a35:2f10::1,128"
-    endpoint: "mail.merlinschumacher.de:51871"
+  publickey: 8Co5YSeDH7355ZcdkKiNqBg8Ejhe+ZzF7PY9cByHF08=
+  allowedips: "10.0.0.1/32, fdbd:2a35:2f10::1,128"
+  endpoint: "mail.merlinschumacher.de:51871"
 mailserver_hostname: mail.merlinschumacher.de
 mailserver_port: 465
 mailserver_username: notifications@merlinschumacher.de
 borgwarehouse_repo_folder: "/srv/media3/backup/"
+cf_dyndns_hostname: msch.cc
+cf_dyndns_zoneid: "msch.cc"
+inadyn_allow_ipv6: true
+inadyn_providers:
+  - name: cloudflare
+    index: 1
+    username: "{{ cf_dyndns_zoneid }}"
+    password: "{{ cf_dyndns_token }}"
+    hostname: "{{ cf_dyndns_hostname }}"
+    checkip_server: "1.1.1.1"
+    checkip_path: "/cdn-cgi/trace"
+  - name: cloudflare
+    index: 2
+    username: "{{ cf_dyndns_zoneid }}"
+    password: "{{ cf_dyndns_token }}"
+    hostname: "{{ cf_dyndns_hostname }}"
+    checkip_server: "dns64.cloudflare-dns.com"
+    checkip_path: "/cdn-cgi/trace"

@@ -1,7 +1,9 @@
 ---
 roles:
   - geerlingguy.docker
-  - git+https://github.com/stuvusIT/ansible_systemd.git
+  - aruhier.systemd_networkd
+  - src: git+https://github.com/merlinschumacher/ansible-role-inadyn
+    name: mivek.inadyn
 
 collections:
   - community.general

@@ -34,5 +34,6 @@
   with_items:
     - "compose.yaml.j2"
     - "jellyfin.env.j2"
+    - "jellyplex-watched.env.j2"
   notify:
     - jellyfin-recreate

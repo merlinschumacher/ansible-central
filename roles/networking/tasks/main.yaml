@@ -20,7 +20,7 @@
   args:
     creates: "{{ networking_wireguard_preshared_key_file }}"
 
-- name: Change key file owners to systtemd-network
+- name: Change key file owners to systemd-network
   ansible.builtin.file:
     path: "{{ item }}"
     owner: systemd-network
@@ -33,32 +33,43 @@
 
 - name: Configure network interfaces
   ansible.builtin.include_role:
-    name: ansible_systemd
+    name: aruhier.systemd_networkd
   vars:
-    # noqa: var-naming[no-role-prefix]
-    systemd_network_networks:
-      enp5s0:
-        Network:
-          DHCP: true
-      wg0:
-        Network:
-          Address:
-            - "10.0.0.2/24"
-            - "fdbd:2a35:2f10::2/64"
+    systemd_networkd_apply_config: true
+    systemd_networkd_enable_resolved: true
+    systemd_networkd_cleanup: true
+    systemd_networkd_network:
+      10-ethernet:
+        - Match:
+            - Name: "en*"
+        - Network:
+            - DHCP: "yes"
+            - IPv6AcceptRA: "yes"
+            - Domains: "msch.internal"
+            - LLMNR: "resolve"
+            - MulticastDNS: "resolve"
+            - Domains: "msch.internal media.msch.internal iot.msch.internal msch.cc"
+      10-wg0:
+        - Match:
+            - Name: "wg0"
+        - Network:
+            - Address: "10.0.0.2/24"
+            - Address: "fdbd:2a35:2f10::2/64"
 
-    systemd_network_netdevs:
-      wg0:
-        NetDev:
-          Kind: wireguard
-          Description: WireGuard tunnel
-        WireGuard:
-          PrivateKeyFile: "{{ networking_wireguard_private_key_file }}"
-          ListenPort: 51902
-        WireGuardPeer:
-          - PublicKey: "{{ networking_wireguard_peer.publickey }}"
-            AllowedIPs: "{{ networking_wireguard_peer.allowedips }}"
-            Endpoint: "{{ networking_wireguard_peer.endpoint }}"
-            PresharedKeyFile: "{{ networking_wireguard_preshared_key_file }}"
+    systemd_networkd_netdev:
+      10-wg0:
+        - NetDev:
+            - Name: wg0
+            - Kind: wireguard
+            - Description: WireGuard tunnel
+        - WireGuard:
+            - PrivateKeyFile: "{{ networking_wireguard_private_key_file }}"
+            - ListenPort: 51902
+        - WireGuardPeer:
+            - PublicKey: "{{ networking_wireguard_peer.publickey }}"
+            - AllowedIPs: "{{ networking_wireguard_peer.allowedips }}"
+            - Endpoint: "{{ networking_wireguard_peer.endpoint }}"
+            - PresharedKeyFile: "{{ networking_wireguard_preshared_key_file }}"
 
 - name: Create proxy network
   community.docker.docker_network:
