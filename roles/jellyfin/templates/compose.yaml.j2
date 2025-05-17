@@ -43,7 +43,6 @@ services:
       - 'traefik.http.services.jellyfin-svc.loadBalancer.passHostHeader=true'
 
   jellyplex-watched:
-    user: 1000:1000
     image: luigi311/jellyplex-watched:latest
     container_name: jellyplex-watched
     restart: unless-stopped
@@ -51,6 +50,8 @@ services:
       - PUID=1000
       - PGID=1000
     env_file: jellyplex-watched.env
+    volumes:
+      - {{ jellyfin_base_folder }}/data/watched-logs:/logs
 
 networks:
   default:
