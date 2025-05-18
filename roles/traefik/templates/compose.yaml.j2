@@ -1,28 +1,48 @@
+# jinja2: lstrip_blocks=True, trim_blocks=True
 ---
 services:
   proxy:
     image: traefik:v3
+    hostname: proxy
     container_name: proxy
     restart: always
+    security_opt:
+      - no-new-privileges=true
     networks:
+      default:
       {{ docker_proxy_network }}:
+        ipv4_address: {{ docker_traefik_proxy_network_addresses["ipv4_address"] }}
+        ipv6_address: {{ docker_traefik_proxy_network_addresses["ipv6_address"] }}
       {{ docker_proxy_security_network }}:
-        ipv4_address: "172.30.0.3"
-        ipv6_address: "fd3c:3065:745::3"
+        ipv4_address: {{ docker_traefik_proxy_security_network_addresses["ipv4_address"] }}
+        ipv6_address: {{ docker_traefik_proxy_security_network_addresses["ipv6_address"] }}
     ports:
-      - "80:80"
-      - "443:443"
-      - "{{ borgwarehouse_ssh_port }}:{{ borgwarehouse_ssh_port }}"
-      #- "{{ mosquitto_mqtt_port }}:{{ mosquitto_mqtt_port }}"
-      - "{{ mosquitto_mqttsecure_port }}:{{ mosquitto_mqttsecure_port }}"
+      - 80:80
+      - 443:443
+{% for entrypoint in docker_traefik_entrypoints %}
+      - {{ docker_traefik_entrypoints[entrypoint] }}:{{ docker_traefik_entrypoints[entrypoint] }}
+{% endfor %}
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "{{ traefik_base_folder }}/data/config:/etc/traefik"
-      - "{{ traefik_base_folder }}/data/logs:/var/log/traefik"
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - {{ traefik_base_folder }}/data/config:/etc/traefik
+      - {{ traefik_base_folder }}/data/logs:/var/log/traefik
     env_file:
-      - "{{ traefik_base_folder }}/traefik.env"
+      - {{ traefik_base_folder }}/traefik.env
+  whoami:
+    image: traefik/whoami
+    container_name: whoami
+    hostname: test.{{ ansible_hostname }}
+    restart: always
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik_default
+      - traefik.http.routers.whoami.rule=Host(`test.{{ ansible_domain }}`)
+      - traefik.http.services.whoami.loadBalancer.server.port=80
+      - traefik.http.routers.whoami.entrypoints={{ docker_traefik_https_endpoint }}
+      - traefik.http.routers.whoami.middlewares={{ docker_traefik_lan_middleware }}
 
 networks:
+  default:
   {{ docker_proxy_network }}:
     external: true
   {{ docker_proxy_security_network }}:

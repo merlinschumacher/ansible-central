@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://json.schemastore.org/traefik-v3.json
+# jinja2: lstrip_blocks=True, trim_blocks=True
 ---
 api:
   dashboard: false
@@ -19,12 +20,12 @@ accessLog:
       names:
           User-Agent: keep # log user agent strings
 
-metrics:
-  influxDB2:
-    address: http://localhost:8086
-    org: merlinschumacher.de
-    bucket: traefik
-    token: {{ traefik_influxdb_token }}
+#metrics:
+#  influxDB2:
+#    address: http://localhost:8086
+#    org: merlinschumacher.de
+#    bucket: traefik
+#    token: {{ traefik_influxdb_token }}
 
 log:
   level: INFO
@@ -45,13 +46,17 @@ entryPoints:
       middlewares:
         - crowdsec-bouncer@file
       tls:
+        options: modern@file
         certResolver: 'default'
         domains:
           - main: "*.{{ ansible_domain }}"
             sans:
               - "{{ ansible_domain }}"
               - "*.merlinschumacher.de"
-  {{ traefik_additional_entrypoints | to_nice_yaml(indent=2) | indent(2) }}
+{% for entrypoint in docker_traefik_entrypoints %}
+  {{ entrypoint }}:
+    address: ":{{ docker_traefik_entrypoints[entrypoint] }}"
+{% endfor %}
 
 providers:
   docker:

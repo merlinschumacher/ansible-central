@@ -34,13 +34,13 @@ services:
       - certs:/certs:ro
     networks:
       default:
-      {{ docker_proxy_network }}:
       {{ docker_proxy_security_network }}:
-        ipv4_address: "172.30.0.4"
-        ipv6_address: "fd3c:3065:745::4"
+        ipv4_address: "172.19.0.4"
+        ipv6_address: "fd3c:3065:19::4"
     env_file: "{{ authentik_base_folder }}/authentik.env"
     labels:
       - traefik.enable=true
+      - traefik.docker.network={{ docker_proxy_security_network }}
       - traefik.http.routers.authentik.rule=(HostRegexp(`^.+\.{{ ansible_domain | replace('.', '\.') }}$`) && PathPrefix(`/outpost.goauthentik.io/`)) || Host(`auth.{{ ansible_domain }}`)
       - traefik.http.services.authentik.loadbalancer.server.port=9000
       - traefik.http.routers.authentik.entrypoints={{ docker_traefik_https_endpoint }}
@@ -79,7 +79,5 @@ volumes:
     external: true
 
 networks:
-  {{ docker_proxy_network }}:
-    external: true
   {{ docker_proxy_security_network }}:
     external: true

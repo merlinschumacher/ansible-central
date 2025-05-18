@@ -19,13 +19,20 @@
   notify:
     - traefik-recreate
 
-- name: Create traefik config files from template
+- name: Create traefik static config files from template
   ansible.builtin.template:
     src: "{{ item }}"
     dest: "{{ traefik_base_folder }}/data/config/{{ item | basename | regex_replace('\\.j2$', '') }}"
     mode: "0640"
   with_items:
     - "traefik.yaml.j2"
-    - "dynamic.yaml.j2"
   notify:
     - traefik-recreate
+
+- name: Create traefik dynamic config files from template
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ traefik_base_folder }}/data/config/{{ item | basename | regex_replace('\\.j2$', '') }}"
+    mode: "0640"
+  with_items:
+    - "dynamic.yaml.j2"

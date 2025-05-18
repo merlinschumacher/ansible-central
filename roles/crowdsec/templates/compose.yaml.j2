@@ -8,10 +8,12 @@ services:
       - "127.0.0.1:8080:8080"
     networks:
       {{ docker_proxy_security_network }}:
-        ipv4_address: "172.30.0.2"
-        ipv6_address: "fd3c:3065:745::2"
+        ipv4_address: "172.19.0.3"
+        ipv6_address: "fd3c:3065:19::3"
     env_file:
       - "{{ crowdsec_base_folder }}/crowdsec.env"
+    labels:
+      - traefik.docker.network={{ docker_proxy_security_network }}
     volumes:
       - "{{ crowdsec_base_folder }}/data/db:/var/lib/crowdsec/data/"
       - "{{ crowdsec_base_folder }}/data/config:/etc/crowdsec/"

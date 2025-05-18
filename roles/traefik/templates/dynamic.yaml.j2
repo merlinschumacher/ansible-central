@@ -1,26 +1,46 @@
 # yaml-language-server: $schema=https://json.schemastore.org/traefik-v3.json
+# jinja2: lstrip_blocks=True, trim_blocks=True
 ---
 http:
   middlewares:
+    hsts-header:
+      headers:
+        customResponseHeaders:
+          Strict-Transport-Security: max-age=63072000
     https-redirect:
       redirectScheme:
         scheme: https
     {{ docker_traefik_lan_middleware | split('@') | first }}:
       ipAllowList:
-        sourceRange:
-          - "172.18.0.0/16"
-          - "172.30.0.0/16"
-          - "127.0.0.1/32"
-          - "10.138.1.0/24"
-          - "10.138.4.0/24"
-          - "10.138.5.0/24"
-          - "fe80:0:8678:48ff::/64"
-          - "fd00:464e:6dff:fe53::/64"
-          - "fd3c:3065:745::/64"
-          - "fd3c:3065:744::/64"
+        rejectStatusCode: 404
+        sourceRange: 
+        {{ docker_traefik_lan_ip_allowlist | to_nice_yaml(indent=2) | indent(8) }}
     crowdsec-bouncer:
         plugin:
             crowdsec-bouncer-traefik-plugin:
                 enabled: true
                 crowdsecAppsecEnabled: true
                 crowdsecLapiKey: {{ traefik_crowdsec_bouncer_token }}
+
+tls:
+  options:
+    modern:
+      minVersion: VersionTLS13
+      curvePreferences:
+        - X25519
+        - CurveP256
+        - CurveP384
+
+    default:
+      minVersion: VersionTLS12
+      curvePreferences:
+        - X25519
+        - CurveP256
+        - CurveP384
+      cipherSuites:
+        - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+        - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305

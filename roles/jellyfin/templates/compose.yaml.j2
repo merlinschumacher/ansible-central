@@ -4,6 +4,11 @@ services:
     container_name: jellyfin
     hostname: media.{{ ansible_domain}}
     user: 1000:1000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     restart: always
     group_add: 
       - '{{ video_group[0] }}' 
@@ -38,11 +43,20 @@ services:
       - 'traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true'
       - 'traefik.http.middlewares.jellyfin-mw.headers.customresponseheaders.X-XSS-PROTECTION=1'
       - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://media.{{ ansible_domain }}'"
-      - 'traefik.http.routers.jellyfin.service=jellyfin-svc'
-      - 'traefik.http.services.jellyfin-svc.loadBalancer.server.port=8096'
-      - 'traefik.http.services.jellyfin-svc.loadBalancer.passHostHeader=true'
+      - 'traefik.http.routers.jellyfin.service=jellyfin'
+      - 'traefik.http.services.jellyfin.loadBalancer.server.port=8096'
+      - 'traefik.http.services.jellyfin.loadBalancer.passHostHeader=true'
+      - 'traefik.tcp.routers.jellyfin-service-discovery.entryPoints=jellyfin-service-discovery'
+      - 'traefik.tcp.routers.jellyfin-service-discovery.rule=HostSNI(`*`)'
+      - 'traefik.tcp.routers.jellyfin.service-discovery=jellyfin-service-discovery'
+      - 'traefik.tcp.services.jellyfin-service-discovery.loadBalancer.server.port=1900'
+      - 'traefik.udp.routers.jellyfin-client-discovery.entryPoints=jellyfin-client-discovery'
+      - 'traefik.udp.routers.jellyfin-client-discovery.rule=HostSNI(`*`)'
+      - 'traefik.udp.routers.jellyfin.client-discovery=jellyfin-service-discovery'
+      - 'traefik.udp.services.jellyfin-client-discovery.loadBalancer.server.port=7359'
 
   jellyplex-watched:
+    hostname: jellyplex-watched
     image: luigi311/jellyplex-watched:latest
     container_name: jellyplex-watched
     restart: unless-stopped
