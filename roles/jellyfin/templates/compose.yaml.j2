@@ -31,6 +31,9 @@ services:
       - 'traefik.http.routers.jellyfin.entryPoints={{ docker_traefik_https_endpoint }}'
       - 'traefik.http.routers.jellyfin.rule=Host(`media.{{ ansible_domain }}`)' 
       - 'traefik.http.routers.jellyfin.middlewares=jellyfin-mw'
+      - 'traefik.http.routers.jellyfin.service=jellyfin'
+      - 'traefik.http.services.jellyfin.loadBalancer.server.port=8096'
+      - 'traefik.http.services.jellyfin.loadBalancer.passHostHeader=true'
       - 'traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
       - 'traefik.http.middlewares.jellyfin-mw.headers.SSLRedirect=true'
       - 'traefik.http.middlewares.jellyfin-mw.headers.SSLHost=media.msch.cc'
@@ -43,16 +46,12 @@ services:
       - 'traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true'
       - 'traefik.http.middlewares.jellyfin-mw.headers.customresponseheaders.X-XSS-PROTECTION=1'
       - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://media.{{ ansible_domain }}'"
-      - 'traefik.http.routers.jellyfin.service=jellyfin'
-      - 'traefik.http.services.jellyfin.loadBalancer.server.port=8096'
-      - 'traefik.http.services.jellyfin.loadBalancer.passHostHeader=true'
       - 'traefik.tcp.routers.jellyfin-service-discovery.entryPoints=jellyfin-service-discovery'
       - 'traefik.tcp.routers.jellyfin-service-discovery.rule=HostSNI(`*`)'
-      - 'traefik.tcp.routers.jellyfin.service-discovery=jellyfin-service-discovery'
+      - 'traefik.tcp.routers.jellyfin-service-discovery=jellyfin-service-discovery'
       - 'traefik.tcp.services.jellyfin-service-discovery.loadBalancer.server.port=1900'
       - 'traefik.udp.routers.jellyfin-client-discovery.entryPoints=jellyfin-client-discovery'
-      - 'traefik.udp.routers.jellyfin-client-discovery.rule=HostSNI(`*`)'
-      - 'traefik.udp.routers.jellyfin.client-discovery=jellyfin-service-discovery'
+      - 'traefik.udp.routers.jellyfin-client-discovery.service=jellyfin-service-discovery'
       - 'traefik.udp.services.jellyfin-client-discovery.loadBalancer.server.port=7359'
 
   jellyplex-watched:
