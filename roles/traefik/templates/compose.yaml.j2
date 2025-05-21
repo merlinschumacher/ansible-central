@@ -20,7 +20,7 @@ services:
       - 80:80
       - 443:443
 {% for entrypoint in docker_traefik_entrypoints %}
-      - {{ docker_traefik_entrypoints[entrypoint] }}:{{ docker_traefik_entrypoints[entrypoint] }}
+      - {{ docker_traefik_entrypoints[entrypoint] | split('/') | first }}:{{ docker_traefik_entrypoints[entrypoint] }}
 {% endfor %}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro

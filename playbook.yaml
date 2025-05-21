@@ -27,6 +27,7 @@
       # LAN ranges
       - "10.138.0.0/16"
       - "fd4f:8843:b4e6::/48"
+      - "fe80::0/64"
       # V-Server
       - "10.0.0.2/32"
       - "fdbd:2a35:2f10::2/128"
@@ -36,8 +37,8 @@
     borgwarehouse_ssh_port: 11022
     borg_backup_repository: "ssh://borgwarehouse@backup.msch.cc:11022/./ca807104"
 
-    jellyfin_client_discovery_port: 7359
-    jellyfin_service_discovery_port: 1900
+    jellyfin_client_discovery_port: "7359/udp"
+    jellyfin_service_discovery_port: "1900/udp"
     docker_traefik_entrypoints:
       borgwarehousessh: "{{ borgwarehouse_ssh_port }}"
       # mosquitto: "{{ mosquitto_mqtt_port }}"
