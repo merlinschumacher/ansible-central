@@ -1,0 +1,8 @@
+include:
+    - jellyseer.yaml
+
+networks:
+    default:
+    {{ docker_proxy_network }}:
+        enable_ipv6: true
+        external: true

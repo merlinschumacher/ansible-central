@@ -103,10 +103,10 @@
       tags:
         - services
         - jellyfin
-    # - role: portainer
-    #  tags:
-    #    - services
-    #    - portainer
+    - role: media
+      tags:
+        - services
+        - media
   pre_tasks:
     - name: Install base packages
       ansible.builtin.apt:
