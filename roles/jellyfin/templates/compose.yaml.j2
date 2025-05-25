@@ -46,13 +46,13 @@ services:
       - 'traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true'
       - 'traefik.http.middlewares.jellyfin-mw.headers.customresponseheaders.X-XSS-PROTECTION=1'
       - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://media.{{ ansible_domain }}'"
-      - 'traefik.tcp.routers.jellyfin-service-discovery.entryPoints=jellyfin-service-discovery'
-      - 'traefik.tcp.routers.jellyfin-service-discovery.rule=HostSNI(`*`)'
-      - 'traefik.tcp.routers.jellyfin-service-discovery=jellyfin-service-discovery'
-      - 'traefik.tcp.services.jellyfin-service-discovery.loadBalancer.server.port=1900'
-      - 'traefik.udp.routers.jellyfin-client-discovery.entryPoints=jellyfin-client-discovery'
-      - 'traefik.udp.routers.jellyfin-client-discovery.service=jellyfin-service-discovery'
-      - 'traefik.udp.services.jellyfin-client-discovery.loadBalancer.server.port=7359'
+      - 'traefik.tcp.routers.jellyfinsd.entryPoints=jellyfinsd'
+      - 'traefik.tcp.routers.jellyfinsd.rule=HostSNI(`*`)'
+      - 'traefik.tcp.routers.jellyfinsd.service=jellyfincd'
+      - 'traefik.tcp.services.jellyfinsd.loadBalancer.server.port=1900'
+      - 'traefik.udp.routers.jellyfincd.entryPoints=jellyfincd'
+      - 'traefik.udp.routers.jellyfincd.service=jellyfincd'
+      - 'traefik.udp.services.jellyfincd.loadBalancer.server.port=7359'
 
   jellyplex-watched:
     hostname: jellyplex-watched

@@ -15,8 +15,8 @@
     docker_traefik_https_endpoint: "web-secure"
     docker_traefik_auth_middleware: "proxyauth"
     docker_traefik_lan_middleware: "lan-whitelist@file"
-    mosquitto_mqtt_port: 1883
-    mosquitto_mqttsecure_port: 8883
+    mosquitto_mqtt_port: "1883/tcp"
+    mosquitto_mqttsecure_port: "8883/tcp"
     docker_traefik_lan_ip_allowlist:
       # Docker internal ranges
       - "127.0.0.1/32"
@@ -34,17 +34,17 @@
 
     authentik_docker_tag: "2025.4"
 
-    borgwarehouse_ssh_port: 11022
+    borgwarehouse_ssh_port: "11022/tcp"
     borg_backup_repository: "ssh://borgwarehouse@backup.msch.cc:11022/./ca807104"
 
     jellyfin_client_discovery_port: "7359/udp"
     jellyfin_service_discovery_port: "1900/udp"
     docker_traefik_entrypoints:
       borgwarehousessh: "{{ borgwarehouse_ssh_port }}"
-      # mosquitto: "{{ mosquitto_mqtt_port }}"
+      mqtt: "{{ mosquitto_mqtt_port }}"
       mqttsecure: "{{ mosquitto_mqttsecure_port }}"
-      jellyfin-service-discovery: "{{ jellyfin_service_discovery_port }}"
-      jellyfin-client-discovery: "{{ jellyfin_client_discovery_port }}"
+      jellyfinsd: "{{ jellyfin_service_discovery_port }}"
+      jellyfincd: "{{ jellyfin_client_discovery_port }}"
 
   roles:
     - role: hifis.toolkit.unattended_upgrades
