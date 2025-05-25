@@ -48,10 +48,9 @@ services:
       #- 'traefik.http.middlewares.jellyfin-mw.headers.browserXssFilter=true'
       #- 'traefik.http.middlewares.jellyfin-mw.headers.referrerPolicy=strict-origin-when-cross-origin' 
       #- "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://media.{{ ansible_domain }}'"
-      - 'traefik.tcp.routers.jellyfinsd.entryPoints=jellyfinsd'
-      - 'traefik.tcp.routers.jellyfinsd.rule=HostSNI(`media.{{ ansible_domain }}`)'
-      - 'traefik.tcp.routers.jellyfinsd.service=jellyfinsd'
-      - 'traefik.tcp.services.jellyfinsd.loadBalancer.server.port=1900'
+      #- 'traefik.udp.routers.jellyfinsd.entryPoints=jellyfinsd'
+      #- 'traefik.udp.routers.jellyfinsd.service=jellyfinsd'
+      #- 'traefik.udp.services.jellyfinsd.loadBalancer.server.port=1900'
       - 'traefik.udp.routers.jellyfincd.entryPoints=jellyfincd'
       - 'traefik.udp.routers.jellyfincd.service=jellyfincd'
       - 'traefik.udp.services.jellyfincd.loadBalancer.server.port=7359'
