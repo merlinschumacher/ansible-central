@@ -39,14 +39,13 @@ entryPoints:
           to: {{ docker_traefik_https_endpoint }}
           scheme: https
   {{ docker_traefik_https_endpoint }}:
-    http3:
-      advertisedPort: 443
+    asDefault: true
+    http3: {}
     address: ":443"
     http:
       middlewares:
         - crowdsec-bouncer@file
       tls:
-        options: modern@file
         certResolver: 'default'
         domains:
           - main: "*.{{ ansible_domain }}"
