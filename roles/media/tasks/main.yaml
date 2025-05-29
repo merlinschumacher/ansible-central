@@ -1,21 +1,12 @@
 ---
-- name: Create jellyseer config folder
-  ansible.builtin.file:
-    name: "{{ media_jellyseer_base_folder }}/config"
-    state: directory
-    owner: 1000
-    group: 1000
-    mode: "0700"
-    force: false
+- name: Include Jellyfin tasks
+  ansible.builtin.include_tasks: 10-jellyfin.yaml
 
-- name: Create media compose files from template
-  ansible.builtin.template:
-    src: "{{ item }}"
-    dest: "{{ media_base_folder }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
-    mode: "0640"
-  with_items:
-    - "compose.yaml.j2"
-    - "jellyseer.yaml.j2"
-    - "jellyseer.env.j2"
-  notify:
-    - media-recreate
+- name: Include JellyPlex Watched tasks
+  ansible.builtin.include_tasks: 20-jellyplex-watched.yaml
+
+- name: Include Jellyseer tasks
+  ansible.builtin.include_tasks: 30-jellyseer.yaml
+
+- name: Include Compose tasks
+  ansible.builtin.include_tasks: 90-compose.yaml

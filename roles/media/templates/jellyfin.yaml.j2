@@ -17,15 +17,18 @@ services:
       - /dev/dri/renderD128:/dev/dri/renderD128
       - /dev/dri/card0:/dev/dri/card0
     volumes:
-      - {{ jellyfin_base_folder }}/data/config:/config
-      - {{ jellyfin_base_folder }}/data/cache:/cache
+      - {{ media_base_folder }}/data/config:/config
+      - {{ media_base_folder }}/data/cache:/cache
       - /srv/media3/Serien:/tv
       - /srv/media3/Filme:/movies
     env_file:
-      - {{ jellyfin_base_folder }}/jellyfin.env
+      - {{ media_base_folder }}/jellyfin.env
     networks:
       - default
       - {{ docker_proxy_network }}
+    ports:
+      - "7359:7359/udp"
+      - "1909:1900/udp"
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.jellyfin.entryPoints={{ docker_traefik_https_endpoint }}'
@@ -46,27 +49,3 @@ services:
       - 'traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true'
       - 'traefik.http.middlewares.jellyfin-mw.headers.customresponseheaders.X-XSS-PROTECTION=1'
       - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://media.{{ ansible_domain }}'"
-      - 'traefik.tcp.routers.jellyfinsd.entryPoints=jellyfinsd'
-      - 'traefik.tcp.routers.jellyfinsd.rule=HostSNI(`*`)'
-      - 'traefik.tcp.routers.jellyfinsd.service=jellyfincd'
-      - 'traefik.tcp.services.jellyfinsd.loadBalancer.server.port=1900'
-      - 'traefik.udp.routers.jellyfincd.entryPoints=jellyfincd'
-      - 'traefik.udp.routers.jellyfincd.service=jellyfincd'
-      - 'traefik.udp.services.jellyfincd.loadBalancer.server.port=7359'
-
-  jellyplex-watched:
-    hostname: jellyplex-watched
-    image: luigi311/jellyplex-watched:latest
-    container_name: jellyplex-watched
-    restart: unless-stopped
-    environment:
-      - PUID=1000
-      - PGID=1000
-    env_file: jellyplex-watched.env
-    volumes:
-      - {{ jellyfin_base_folder }}/data/watched-logs:/logs
-
-networks:
-  default:
-  {{ docker_proxy_network }}:
-    external: true

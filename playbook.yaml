@@ -36,15 +36,10 @@
 
     borgwarehouse_ssh_port: "11022/tcp"
     borg_backup_repository: "ssh://borgwarehouse@backup.msch.cc:11022/./ca807104"
-
-    jellyfin_client_discovery_port: "7359/udp"
-    jellyfin_service_discovery_port: "1900/udp"
     docker_traefik_entrypoints:
       borgwarehousessh: "{{ borgwarehouse_ssh_port }}"
       mqtt: "{{ mosquitto_mqtt_port }}"
       mqttsecure: "{{ mosquitto_mqttsecure_port }}"
-      jellyfinsd: "{{ jellyfin_service_discovery_port }}"
-      jellyfincd: "{{ jellyfin_client_discovery_port }}"
 
   roles:
     - role: hifis.toolkit.unattended_upgrades
@@ -99,10 +94,6 @@
         - services
         - borg
         - backup
-    - role: jellyfin
-      tags:
-        - services
-        - jellyfin
     - role: media
       tags:
         - services
