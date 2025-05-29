@@ -1,7 +1,7 @@
 ---
 - name: Create Jellyfin config folder
   ansible.builtin.file:
-    name: "{{ media_base_folder }}/data/config"
+    name: "{{ media_jellyfin_base_folder }}/config"
     state: directory
     owner: 1000
     group: 1000
@@ -10,7 +10,7 @@
 
 - name: Create Jellyfin cache folder
   ansible.builtin.file:
-    name: "{{ media_base_folder }}/data/cache"
+    name: "{{ media_jellyfin_base_folder }}/cache"
     state: directory
     owner: 1000
     group: 1000

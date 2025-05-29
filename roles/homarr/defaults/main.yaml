@@ -1,0 +1,5 @@
+---
+homarr_base_folder: "{{ docker_base_folder }}/homarr"
+homarr_data_folder: "{{ homarr_base_folder }}/data"
+homarr_puid: 1000
+homarr_pgid: 1000

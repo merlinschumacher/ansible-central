@@ -98,6 +98,10 @@
       tags:
         - services
         - media
+    - role: homarr
+      tags:
+        - services
+        - homarr
   pre_tasks:
     - name: Install base packages
       ansible.builtin.apt:

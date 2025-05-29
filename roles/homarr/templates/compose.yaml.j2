@@ -1,0 +1,24 @@
+---
+services:
+  homarr:
+    container_name: homarr
+    hostname: homarr
+    image: ghcr.io/homarr-labs/homarr:latest
+    restart: always
+    security_opt:
+      - no-new-privileges=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Optional, only if you want docker integration
+      - {{ homarr_data_folder }}:/appdata
+    env_file: {{ homarr_base_folder }}/homarr.env
+    networks:
+      - {{ docker_proxy_network }}
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.homarr.rule=Host(`dash.{{ ansible_domain }}`)'
+      - 'traefik.http.services.homarr.loadbalancer.server.port=7575'
+
+networks:
+    {{ docker_proxy_network }}:
+        enable_ipv6: true
+        external: true

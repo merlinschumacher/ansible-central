@@ -1,0 +1,20 @@
+---
+- name: Create homarr config folder
+  ansible.builtin.file:
+    name: "{{ homarr_data_folder }}/config"
+    state: directory
+    owner: 1000
+    group: 1000
+    mode: "0700"
+    force: false
+
+- name: Create homarr compose file from template
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ homarr_base_folder }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
+    mode: "0640"
+  with_items:
+    - "compose.yaml.j2"
+    - "homarr.env.j2"
+  notify:
+    - homarr-recreate

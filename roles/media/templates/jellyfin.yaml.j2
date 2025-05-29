@@ -17,8 +17,8 @@ services:
       - /dev/dri/renderD128:/dev/dri/renderD128
       - /dev/dri/card0:/dev/dri/card0
     volumes:
-      - {{ media_base_folder }}/data/config:/config
-      - {{ media_base_folder }}/data/cache:/cache
+      - {{ media_jellyfin_base_folder }}/config:/config
+      - {{ media_jellyfin_base_folder }}/cache:/cache
       - /srv/media3/Serien:/tv
       - /srv/media3/Filme:/movies
     env_file:
