@@ -39,3 +39,13 @@
     - "jellyfin.env.j2"
   notify:
     - media-recreate
+
+- name: Create Jellyfin config.json from template
+  ansible.builtin.template:
+    src: "jellyfin-config.json.j2"
+    dest: "{{ media_jellyfin_base_folder }}/config.json"
+    owner: 1000
+    group: 1000
+    mode: "0600"
+  notify:
+    - media-recreate

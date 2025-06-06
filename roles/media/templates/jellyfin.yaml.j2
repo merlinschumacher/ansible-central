@@ -18,6 +18,7 @@ services:
       - /dev/dri/card0:/dev/dri/card0
     volumes:
       - {{ media_jellyfin_base_folder }}/config:/config
+      - {{ media_jellyfin_base_folder }}/config.json:/jellyfin/jellyfin-web/config.json
       - {{ media_jellyfin_base_folder }}/cache:/cache
       - /srv/media3/Serien:/tv
       - /srv/media3/Filme:/movies
@@ -45,7 +46,7 @@ services:
       - 'traefik.http.middlewares.jellyfin-mw.headers.STSIncludeSubdomains=true'
       - 'traefik.http.middlewares.jellyfin-mw.headers.STSPreload=true'
       - 'traefik.http.middlewares.jellyfin-mw.headers.forceSTSHeader=true'
-      {# - 'traefik.http.middlewares.jellyfin-mw.headers.frameDeny=true' #}
+      #- 'traefik.http.middlewares.jellyfin-mw.headers.frameDeny=true'
       - 'traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true'
-      {# - 'traefik.http.middlewares.jellyfin-mw.headers.customresponseheaders.X-XSS-PROTECTION=1' #}
+      #- 'traefik.http.middlewares.jellyfin-mw.headers.customresponseheaders.X-XSS-PROTECTION=1'
       - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://media.{{ ansible_domain }}'"
