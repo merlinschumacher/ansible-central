@@ -31,9 +31,7 @@
       # V-Server
       - "10.0.0.2/32"
       - "fdbd:2a35:2f10::2/128"
-
-    authentik_docker_tag: "2025.4"
-
+    authentik_docker_tag: "2025.6"
     borgwarehouse_ssh_port: "11022/tcp"
     borg_backup_repository: "ssh://borgwarehouse@backup.msch.cc:11022/./ca807104"
     docker_traefik_entrypoints:
