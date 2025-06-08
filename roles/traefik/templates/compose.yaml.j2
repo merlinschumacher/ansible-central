@@ -18,7 +18,8 @@ services:
         ipv6_address: {{ docker_traefik_proxy_security_network_addresses["ipv6_address"] }}
     ports:
       - 80:80
-      - 443:443
+      - 443:443/tcp
+      - 443:443/udp
 {% for entrypoint in docker_traefik_entrypoints %}
       - {{ docker_traefik_entrypoints[entrypoint] | split('/') | first }}:{{ docker_traefik_entrypoints[entrypoint] }}
 {% endfor %}
@@ -28,6 +29,14 @@ services:
       - {{ traefik_base_folder }}/data/logs:/var/log/traefik
     env_file:
       - {{ traefik_base_folder }}/traefik.env
+    labels:
+      - 'traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)'
+      - 'traefik.http.routers.api.service=api@internal' 
+      - 'traefik.http.routers.api.rule=Host(`traefik.{{ ansible_domain }}`)'
+      - 'traefik.http.routers.api.entrypoints={{ docker_traefik_https_endpoint }}'
+      - 'traefik.http.services.api.loadBalancer.server.port=8080'
+      - 'traefik.http.routers.api.middlewares={{ docker_traefik_lan_middleware }}, {{ docker_traefik_auth_middleware }}'
+
   whoami:
     image: traefik/whoami
     container_name: whoami
@@ -38,7 +47,6 @@ services:
       - traefik.docker.network=traefik_default
       - traefik.http.routers.whoami.rule=Host(`test.{{ ansible_domain }}`)
       - traefik.http.services.whoami.loadBalancer.server.port=80
-      - traefik.http.routers.whoami.entrypoints={{ docker_traefik_https_endpoint }}
       - traefik.http.routers.whoami.middlewares={{ docker_traefik_lan_middleware }}
 
 networks:
