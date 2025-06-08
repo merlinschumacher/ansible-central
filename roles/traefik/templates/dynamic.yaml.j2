@@ -3,6 +3,27 @@
 ---
 http:
   middlewares:
+    http-compress:
+      compress:
+        excludedContentTypes:
+          - text/event-stream
+          - application/grpc
+          - application/octet-stream
+          - video/webm
+          - video/mp4
+          - video/mp4-generic
+          - video/h264
+          - video/h265
+          - video/ogg
+          - video/mpeg
+          - video/quicktime
+          - video/x-msvideo
+          - video/mpv
+          - video/matroska
+          - audio/mpeg
+          - audio/ogg
+          - audio/aac
+          - audio/flac
     hsts-header:
       headers:
         customResponseHeaders:
