@@ -3,9 +3,11 @@ services:
   crowdsec:
     image: crowdsecurity/crowdsec:latest-debian
     hostname: {{ ansible_hostname }}
+    container_name: crowdsec
     restart: always
     ports:
       - "127.0.0.1:8080:8080"
+      - 4242:4242/udp
     networks:
       {{ docker_proxy_security_network }}:
         ipv4_address: "172.19.0.3"

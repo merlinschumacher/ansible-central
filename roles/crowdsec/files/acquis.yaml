@@ -37,7 +37,26 @@ labels:
 ---
 source: docker
 container_name:
- - authentik-server-*
- - authentik-worker-*
+ - authentik-server-1
+ - authentik-worker-1
+ - authentik-ldap
 labels:
   type: authentik
+---
+source: docker 
+container_name:
+  - jellyfin
+labels:
+  type: jellyfin
+---
+source: docker 
+container_name:
+  - immich_server
+labels:
+  type: immich
+---
+source: syslog
+listen_addr: 0.0.0.0
+listen_port: 4242
+labels:
+  type: unifi

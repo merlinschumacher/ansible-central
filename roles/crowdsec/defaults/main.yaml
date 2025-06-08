@@ -13,14 +13,9 @@ crowdsec_collections_list:
   - crowdsecurity/appsec-virtual-patching
   - crowdsecurity/appsec-generic-rules
   - crowdsecurity/appsec-crs
-  - crowdsecurity/postfix
-  - crowdsecurity/dovecot
-  - crowdsecurity/wordpress
-  - crowdsecurity/appsec-wordpress
-  - crowdsecurity/apache2
-  - crowdsecurity/mysql
-  - crowdsecurity/pgsql
-  - crowdsecurity/whitelist-good-actors
+  - crowdsecurity/unifi
   - Dominic-Wagner/vaultwarden
   - timokoessler/uptime-kuma
   - firix/authentik
+  - LePresidente/jellyfin
+  - gauth-fr/immich
