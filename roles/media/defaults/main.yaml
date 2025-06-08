@@ -1,0 +1,5 @@
+---
+media_base_folder: "{{ docker_base_folder }}/media"
+media_data: "{{ media_base_folder }}/data"
+media_jellyseer_base_folder: "{{ media_data }}/jellyseer"
+media_jellyfin_base_folder: "{{ media_data }}/jellyfin"

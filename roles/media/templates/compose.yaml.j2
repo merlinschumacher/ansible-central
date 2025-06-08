@@ -1,0 +1,10 @@
+include:
+    - jellyfin.yaml
+    - jellyseer.yaml
+    - jellyplex-watched.yaml
+
+networks:
+    default:
+    {{ docker_proxy_network }}:
+        enable_ipv6: true
+        external: true

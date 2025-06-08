@@ -1,0 +1,46 @@
+{
+  "includeCorsCredentials": false,
+  "multiserver": false,
+  "themes": [
+    {
+      "name": "Dark",
+      "id": "dark",
+      "color": "#202020",
+      "default": true
+    },
+    {
+      "name": "Light",
+      "id": "light",
+      "color": "#303030"
+    }
+  ],
+  "menuLinks": [
+    {
+      "name": "Requests",
+      "icon": "downloading",
+      "url": "https://requests.{{ ansible_domain }}/"
+    }
+  ],
+  "servers": [
+    {
+      "name": "Media",
+      "url": "https://media.{{ ansible_domain }}",
+    }
+  ],
+  "plugins": [
+    "playAccessValidation/plugin",
+    "experimentalWarnings/plugin",
+    "htmlAudioPlayer/plugin",
+    "htmlVideoPlayer/plugin",
+    "photoPlayer/plugin",
+    "comicsPlayer/plugin",
+    "bookPlayer/plugin",
+    "youtubePlayer/plugin",
+    "backdropScreensaver/plugin",
+    "pdfPlayer/plugin",
+    "logoScreensaver/plugin",
+    "sessionPlayer/plugin",
+    "chromecastPlayer/plugin",
+    "syncPlay/plugin"
+  ]
+}

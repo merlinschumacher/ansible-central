@@ -1,0 +1,17 @@
+services:
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    env_file: {{ media_base_folder }}/jellyseer.env
+    volumes:
+      - {{ media_jellyseer_base_folder }}/config:/app/config
+    networks:
+      - default
+      - {{ docker_proxy_network }}
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyseerr.rule=Host(`requests.{{ ansible_domain }}`)"
+      - "traefik.http.routers.jellyseerr.entrypoints={{ docker_traefik_https_endpoint }}"
+      - "traefik.http.services.jellyseerr.loadbalancer.server.port=5055"
+      - "traefik.http.routers.jellyseerr.middlewares={{ docker_traefik_lan_middleware }}"

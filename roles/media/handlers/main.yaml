@@ -1,0 +1,6 @@
+---
+- name: Create media containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ media_base_folder }}"
+    state: present
+  listen: media-recreate

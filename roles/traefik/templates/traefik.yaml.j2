@@ -45,6 +45,7 @@ entryPoints:
     http:
       middlewares:
         - crowdsec-bouncer@file
+        - http-compress@file
       tls:
         certResolver: 'default'
         domains:

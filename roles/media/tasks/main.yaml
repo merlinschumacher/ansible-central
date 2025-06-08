@@ -1,0 +1,12 @@
+---
+- name: Include Jellyfin tasks
+  ansible.builtin.include_tasks: 10-jellyfin.yaml
+
+- name: Include JellyPlex Watched tasks
+  ansible.builtin.include_tasks: 20-jellyplex-watched.yaml
+
+- name: Include Jellyseer tasks
+  ansible.builtin.include_tasks: 30-jellyseer.yaml
+
+- name: Include Compose tasks
+  ansible.builtin.include_tasks: 90-compose.yaml

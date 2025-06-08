@@ -17,15 +17,19 @@ services:
       - /dev/dri/renderD128:/dev/dri/renderD128
       - /dev/dri/card0:/dev/dri/card0
     volumes:
-      - {{ jellyfin_base_folder }}/data/config:/config
-      - {{ jellyfin_base_folder }}/data/cache:/cache
+      - {{ media_jellyfin_base_folder }}/config:/config
+      - {{ media_jellyfin_base_folder }}/config.json:/jellyfin/jellyfin-web/config.json
+      - {{ media_jellyfin_base_folder }}/cache:/cache
       - /srv/media3/Serien:/tv
       - /srv/media3/Filme:/movies
     env_file:
-      - {{ jellyfin_base_folder }}/jellyfin.env
+      - {{ media_base_folder }}/jellyfin.env
     networks:
       - default
       - {{ docker_proxy_network }}
+    ports:
+      - "7359:7359/udp"
+      - "1909:1900/udp"
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.jellyfin.entryPoints={{ docker_traefik_https_endpoint }}'
@@ -35,7 +39,7 @@ services:
       - 'traefik.http.services.jellyfin.loadBalancer.server.port=8096'
       - 'traefik.http.services.jellyfin.loadBalancer.passHostHeader=true'
       - 'traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
-      #- 'traefik.http.middlewares.jellyfin-mw.headers.SSLProxyHeaders.X-Forwarded-Proto=https'
+      - 'traefik.http.middlewares.jellyfin-mw.headers.SSLProxyHeaders.X-Forwarded-Proto=https'
       - 'traefik.http.middlewares.jellyfin-mw.headers.SSLRedirect=true'
       - 'traefik.http.middlewares.jellyfin-mw.headers.SSLHost=media.{{ ansible_domain }}'
       - 'traefik.http.middlewares.jellyfin-mw.headers.SSLForceHost=true'
@@ -46,8 +50,8 @@ services:
       #- 'traefik.http.middlewares.jellyfin-mw.headers.frameDeny=true'
       - 'traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true'
       #- 'traefik.http.middlewares.jellyfin-mw.headers.browserXssFilter=true'
-      #- 'traefik.http.middlewares.jellyfin-mw.headers.referrerPolicy=strict-origin-when-cross-origin' 
-      #- "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://media.{{ ansible_domain }}'"
+      - 'traefik.http.middlewares.jellyfin-mw.headers.referrerPolicy=strict-origin-when-cross-origin' 
+      - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://media.{{ ansible_domain }}'"
       #- 'traefik.udp.routers.jellyfinsd.entryPoints=jellyfinsd'
       #- 'traefik.udp.routers.jellyfinsd.service=jellyfinsd'
       #- 'traefik.udp.services.jellyfinsd.loadBalancer.server.port=1900'
