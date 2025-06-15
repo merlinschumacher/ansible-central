@@ -12,6 +12,8 @@ mailserver_username: notifications@merlinschumacher.de
 borgwarehouse_repo_folder: "/srv/media3/backup/"
 cf_dyndns_hostname: msch.cc
 cf_dyndns_zoneid: msch.cc
+cf_dyndns_hostname2: home.merlinschumacher.de
+cf_dyndns_zoneid2: merlinschumacher.de
 inadyn_allow_ipv6: true
 inadyn_providers:
   - name: cloudflare
@@ -26,5 +28,19 @@ inadyn_providers:
     username: "{{ cf_dyndns_zoneid }}"
     password: "{{ cf_dyndns_token }}"
     hostname: "{{ cf_dyndns_hostname }}"
+    checkip_server: "dns64.cloudflare-dns.com"
+    checkip_path: "/cdn-cgi/trace"
+  - name: cloudflare
+    index: 3
+    username: "{{ cf_dyndns_zoneid2 }}"
+    password: "{{ cf_dyndns_token }}"
+    hostname: "{{ cf_dyndns_hostname2 }}"
+    checkip_server: "1.1.1.1"
+    checkip_path: "/cdn-cgi/trace"
+  - name: cloudflare
+    index: 4
+    username: "{{ cf_dyndns_zoneid2 }}"
+    password: "{{ cf_dyndns_token }}"
+    hostname: "{{ cf_dyndns_hostname2 }}"
     checkip_server: "dns64.cloudflare-dns.com"
     checkip_path: "/cdn-cgi/trace"
