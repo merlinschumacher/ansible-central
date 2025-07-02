@@ -13,3 +13,5 @@ services:
       - {{ media_gluetun_base_folder }}:/gluetun
     env_file:
       - {{ media_base_folder }}/gluetun.env
+    networks:
+      - {{ docker_proxy_network }}
