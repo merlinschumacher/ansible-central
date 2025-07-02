@@ -1,4 +1,7 @@
 ---
+- name: Include Gluetun tasks
+  ansible.builtin.include_tasks: 00-gluetun.yaml
+
 - name: Include Jellyfin tasks
   ansible.builtin.include_tasks: 10-jellyfin.yaml
 

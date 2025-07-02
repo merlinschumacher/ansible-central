@@ -34,6 +34,8 @@ services:
       - "1909:1900/udp"
     labels:
       - 'traefik.enable=true'
+      - 'wud.tag.include=latest'
+      - 'wud.watch.digest=true'
       - 'traefik.http.routers.jellyfin.entryPoints={{ docker_traefik_https_endpoint }}'
       - 'traefik.http.routers.jellyfin.rule=Host(`media.{{ ansible_domain }}`)' 
       - 'traefik.http.routers.jellyfin.middlewares=jellyfin-mw'

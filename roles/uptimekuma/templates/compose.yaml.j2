@@ -12,17 +12,19 @@ services:
     volumes:
       - {{ uptimekuma_base_folder }}/data/uptimekuma:/app/data
     labels:
+      - wud.watch.digest=true
+      - wud.tag.include=^\d+\.?\d*\.?\d*$$
       - traefik.enable=true
       - traefik.http.services.uptimekuma.loadbalancer.server.port=3001
       - traefik.http.routers.uptimekuma.rule=Host(`uptime.{{ ansible_domain }}`)
       - traefik.http.routers.uptimekuma.entrypoints={{ docker_traefik_https_endpoint }}
-      - traefik.http.routers.uptimekuma.middlewares={{ docker_traefik_auth_middleware }}
-  
+      - traefik.http.routers.uptimekuma.middlewares={{ docker_traefik_auth_middleware }},{{ docker_traefik_lan_middleware }}
+
   dockerproxy:
     image: wollomatic/socket-proxy:1 
     container_name: dockerproxy
     command:
-      - '-loglevel=debug' # set to debug for far more logging
+      - '-loglevel=info' # set to debug for far more logging
       - '-allowfrom=uptimekuma'
       - '-listenip=0.0.0.0'
       - '-allowGET=/v1(\\..{2})?/.*'
@@ -30,7 +32,6 @@ services:
       - '-watchdoginterval=600'
       - '-stoponwatchdog'
       - 'allowHealthcheck=true'
-      - '-loglevel=debug'
       - '-allowGET=.*'
       - '-allowHEAD=.*'
       - '-allowPOST=.*'
@@ -52,6 +53,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - docker-proxynet
+    labels:
+      - wud.watch.digest=true
+      - wud.tag.include=^\d+\.?\d*\.?\d*$$
 
 networks:
   docker-proxynet:

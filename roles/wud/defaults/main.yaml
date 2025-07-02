@@ -1,0 +1,3 @@
+---
+wud_base_folder: "{{ docker_base_folder }}/wud"
+wud_data_folder: "{{ wud_base_folder }}/data"

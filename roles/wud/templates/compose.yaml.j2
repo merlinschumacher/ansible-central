@@ -1,0 +1,31 @@
+services:
+  whatsupdocker:
+    image: getwud/wud
+    container_name: wud
+    networks:
+      - {{ docker_proxy_network }}
+    env_file:
+      - {{ wud_base_folder }}/wud.env
+    volumes:
+      - {{ wud_data_folder}}:/store
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.wud.loadbalancer.server.port=3000
+      - traefik.http.routers.wud.rule=Host(`wud.{{ ansible_domain }}`)
+      - traefik.http.routers.wud.entrypoints={{ docker_traefik_https_endpoint }}
+      - traefik.http.routers.wud.middlewares={{ docker_traefik_auth_middleware }},{{ docker_traefik_lan_middleware }}
+      - 'wud.tag.include=^\d+\.\d+\.\d+$$'
+      - 'wud.link.template=https://github.com/getwud/wud/releases/tag/$${major}.$${minor}.$${patch}'
+    healthcheck:
+      test: curl --fail http://localhost:3000/health || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 10s       
+
+networks:
+  proxy:
+    external: true
+    enable_ipv6: true

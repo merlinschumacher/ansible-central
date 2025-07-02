@@ -1,0 +1,27 @@
+---
+- name: Create wud base folder
+  ansible.builtin.file:
+    name: "{{ wud_base_folder }}"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: "0750"
+
+- name: Create wud data folder
+  ansible.builtin.file:
+    name: "{{ wud_data_folder }}/wud"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: "0750"
+
+- name: Create wud files from templates
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ wud_base_folder }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
+    mode: "0640"
+  with_items:
+    - "compose.yaml.j2"
+    - "wud.env.j2"
+  notify:
+    - wud-recreate

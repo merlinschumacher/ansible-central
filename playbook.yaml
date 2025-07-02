@@ -6,34 +6,12 @@
     docker_base_folder: /docker
     docker_proxy_network: "proxy"
     docker_proxy_security_network: "proxysec"
-    docker_traefik_proxy_network_addresses:
-      ipv4_address: "172.18.128.2"
-      ipv6_address: "fd3c:3065:18::1:2"
-    docker_traefik_proxy_security_network_addresses:
-      ipv4_address: "172.19.128.2"
-      ipv6_address: "fd3c:3065:19::1:2"
     docker_traefik_https_endpoint: "web-secure"
     docker_traefik_auth_middleware: "proxyauth"
     docker_traefik_lan_middleware: "lan-whitelist@file"
     mosquitto_mqtt_port: "1883/tcp"
     mosquitto_mqttsecure_port: "8883/tcp"
-    docker_traefik_lan_ip_allowlist:
-      # Docker internal ranges
-      - "127.0.0.1/32"
-      - "172.0.0.0/8"
-      - "fd3c:3065:18::/64"
-      - "fd3c:3065:19::/64"
-      - "fd83:b67c:046c::/48"
-      # LAN ranges
-      - "10.138.0.0/16"
-      - "fd4f:8843:b4e6::/48"
-      - "fe80::0/64"
-      # V-Server
-      - "10.0.0.2/32"
-      - "fdbd:2a35:2f10::2/128"
     authentik_docker_tag: "2025.6"
-    borgwarehouse_ssh_port: "11022/tcp"
-    borg_backup_repository: "ssh://borgwarehouse@backup.msch.cc:11022/./ca807104"
     docker_traefik_entrypoints:
       borgwarehousessh: "{{ borgwarehouse_ssh_port }}"
       mqtt: "{{ mosquitto_mqtt_port }}"
@@ -100,6 +78,10 @@
       tags:
         - services
         - uptimekuma
+    - role: wud
+      tags:
+        - services
+        - wud
   pre_tasks:
     - name: Install base packages
       ansible.builtin.apt:

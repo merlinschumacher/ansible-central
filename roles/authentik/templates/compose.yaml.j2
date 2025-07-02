@@ -12,6 +12,7 @@ services:
       timeout: 5s
     volumes:
       - {{ authentik_base_folder }}/data/postgresql:/var/lib/postgresql/data
+
   redis:
     image: docker.io/library/redis:alpine
     command: --save 60 1 --loglevel warning
@@ -24,6 +25,7 @@ services:
       timeout: 3s
     volumes:
       - {{ authentik_base_folder }}/data/redis:/data
+
   server:
     image: {{ authentik_docker_image }}:{{ authentik_docker_tag }}
     restart: always
@@ -39,6 +41,7 @@ services:
         ipv6_address: "fd3c:3065:19::4"
     env_file: "{{ authentik_base_folder }}/authentik.env"
     labels:
+      - wud.watch.digest=true
       - traefik.enable=true
       - traefik.docker.network={{ docker_proxy_security_network }}
       - traefik.http.routers.authentik.rule=(HostRegexp(`^.+\.{{ ansible_domain | replace('.', '\.') }}$`) && PathPrefix(`/outpost.goauthentik.io/`)) || Host(`auth.{{ ansible_domain }}`)
@@ -71,6 +74,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    labels:
+      - wud.watch.digest=true
 
   ldap:
     container_name: authentik-ldap
@@ -84,6 +89,8 @@ services:
       AUTHENTIK_HOST: https://auth.{{ ansible_domain }}
       AUTHENTIK_INSECURE: "false"
       AUTHENTIK_TOKEN: {{ authentik_ldap_token }}
+    labels:
+      - wud.watch.digest=true
 
 volumes:
   certs:

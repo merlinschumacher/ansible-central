@@ -1,0 +1,6 @@
+---
+- name: Create wud containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ wud_base_folder }}"
+    state: present
+  listen: wud-recreate
