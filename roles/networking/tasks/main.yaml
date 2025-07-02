@@ -79,7 +79,7 @@
     enable_ipv6: true
     ipam_config:
       - subnet: 172.18.0.0/16
-      - subnet: fd3c:3065:18::/64
+      - subnet: fd3c:3065:18::/65
 
 - name: Create proxy security network
   community.docker.docker_network:

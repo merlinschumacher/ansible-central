@@ -7,11 +7,11 @@
     docker_proxy_network: "proxy"
     docker_proxy_security_network: "proxysec"
     docker_traefik_proxy_network_addresses:
-      ipv4_address: "172.18.0.2"
-      ipv6_address: "fd3c:3065:18::2"
+      ipv4_address: "172.18.128.2"
+      ipv6_address: "fd3c:3065:18::1:2"
     docker_traefik_proxy_security_network_addresses:
-      ipv4_address: "172.19.0.2"
-      ipv6_address: "fd3c:3065:19::2"
+      ipv4_address: "172.19.128.2"
+      ipv6_address: "fd3c:3065:19::1:2"
     docker_traefik_https_endpoint: "web-secure"
     docker_traefik_auth_middleware: "proxyauth"
     docker_traefik_lan_middleware: "lan-whitelist@file"
@@ -96,10 +96,10 @@
       tags:
         - services
         - media
-    - role: homarr
+    - role: uptimekuma
       tags:
         - services
-        - homarr
+        - uptimekuma
   pre_tasks:
     - name: Install base packages
       ansible.builtin.apt:

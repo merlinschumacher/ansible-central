@@ -1,2 +1,0 @@
----
-portainer_base_folder: "{{ docker_base_folder }}/portainer"

@@ -1,0 +1,60 @@
+---
+services:
+  uptimekuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptimekuma
+    restart: always
+    security_opt:
+      - no-new-privileges
+    networks:
+      - {{ docker_proxy_network }}
+      - docker-proxynet
+    volumes:
+      - {{ uptimekuma_base_folder }}/data/uptimekuma:/app/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.uptimekuma.loadbalancer.server.port=3001
+      - traefik.http.routers.uptimekuma.rule=Host(`uptime.{{ ansible_domain }}`)
+      - traefik.http.routers.uptimekuma.entrypoints={{ docker_traefik_https_endpoint }}
+      - traefik.http.routers.uptimekuma.middlewares={{ docker_traefik_auth_middleware }}
+  
+  dockerproxy:
+    image: wollomatic/socket-proxy:1 
+    container_name: dockerproxy
+    command:
+      - '-loglevel=debug' # set to debug for far more logging
+      - '-allowfrom=uptimekuma'
+      - '-listenip=0.0.0.0'
+      - '-allowGET=/v1(\\..{2})?/.*'
+      - '-shutdowngracetime=5'
+      - '-watchdoginterval=600'
+      - '-stoponwatchdog'
+      - 'allowHealthcheck=true'
+      - '-loglevel=debug'
+      - '-allowGET=.*'
+      - '-allowHEAD=.*'
+      - '-allowPOST=.*'
+      - '-allowPUT=.*'
+      - '-allowPATCH=.*'
+      - '-allowDELETE=.*'
+      - '-allowCONNECT=.*'
+      - '-allowTRACE=.*'
+      - '-allowOPTIONS=.*'
+    restart: unless-stopped
+    read_only: true
+    mem_limit: 64M
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges
+    user: 65534:{{ docker_group }}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - docker-proxynet
+
+networks:
+  docker-proxynet:
+  proxy:
+    external: true
+    enable_ipv6: true

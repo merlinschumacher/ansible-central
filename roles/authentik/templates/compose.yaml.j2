@@ -65,8 +65,6 @@ services:
       - {{ authentik_base_folder }}/data/authentik/media:/media
       - {{ authentik_base_folder }}/data/authentik/custom-templates:/templates
       - certs:/certs
-    networks:
-      - default
     env_file: "{{ authentik_base_folder }}/authentik.env"
     depends_on:
       postgresql:

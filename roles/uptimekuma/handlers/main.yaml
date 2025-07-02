@@ -1,0 +1,6 @@
+---
+- name: Create uptimekuma containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ uptimekuma_base_folder }}"
+    state: present
+  listen: uptimekuma-recreate
