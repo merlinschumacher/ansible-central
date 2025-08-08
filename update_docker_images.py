@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 """
 Docker Image Version Updater
-Automatically checks for newer Docker image versions using semantic versioning
-Only updates minor and patch versions, skips major version updates by default
+
+Automatically checks for newer Docker image versions using semantic versioning.
+Only updates minor and patch versions, skips major version updates by default.
 """
 
 import argparse
+import json
 import logging
 import sys
 import yaml
-import docker
-import semver
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+
+import requests
+import semver
 
 # Configure logging
 logging.basicConfig(
@@ -24,65 +27,56 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class SemanticVersion:
-    """Handle semantic version parsing and comparison using semver library"""
-
-    def __init__(self, version_string: str):
-        self.original = version_string
-        self.version_string = version_string.lstrip("v")
-
-        if not semver.VersionInfo.isvalid(self.version_string):
-            raise ValueError(f"Invalid semantic version: {version_string}")
-
-        self.version_info = semver.VersionInfo.parse(self.version_string)
-
-    def __str__(self):
-        return self.original
-
-    def __repr__(self):
-        return f"SemanticVersion('{self.original}')"
-
-    def __eq__(self, other):
-        return self.version_info == other.version_info
-
-    def __lt__(self, other):
-        return self.version_info < other.version_info
-
-    def __le__(self, other):
-        return self.version_info <= other.version_info
-
-    def __gt__(self, other):
-        return self.version_info > other.version_info
-
-    def __ge__(self, other):
-        return self.version_info >= other.version_info
-
-    def is_compatible_update(self, other, allow_major: bool = False):
-        """Check if other version is a compatible update"""
-        if other.version_info <= self.version_info:
-            return False
-
-        if other.version_info.major > self.version_info.major:
-            return allow_major
-
-        return True  # Same major, higher minor/patch is allowed
-
-
 class DockerRegistry:
-    """Handle Docker registry API interactions using Docker SDK"""
+    """Handle Docker registry API interactions"""
 
     def __init__(self):
-        self.client = docker.APIClient()
+        self.session = requests.Session()
+        self.session.headers.update(
+            {
+                "User-Agent": "Docker-Image-Updater/1.0",
+                "Accept": "application/json",
+            }
+        )
+
+    def get_dockerhub_tags(self, repository: str) -> List[str]:
+        """Get tags from Docker Hub registry"""
+        # Remove docker.io prefix and library/ for official images
+        repo = repository.replace("docker.io/", "").replace("library/", "")
+
+        url = f"https://registry.hub.docker.com/v2/repositories/{repo}/tags"
+        params = {"page_size": 100}
+
+        try:
+            response = self.session.get(url, params=params, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+
+            tags = []
+            for tag_info in data.get("results", []):
+                tag_name = tag_info.get("name", "")
+                # Filter for version-like tags using semver validation
+                try:
+                    # Try to parse as semantic version
+                    clean_tag = tag_name.lstrip("v")
+                    if semver.VersionInfo.isvalid(clean_tag):
+                        tags.append(tag_name)
+                except Exception:
+                    continue
+
+            return tags[:50]  # Limit to 50 most recent version tags
+
+        except (requests.RequestException, json.JSONDecodeError) as e:
+            logger.warning(f"Failed to fetch tags for {repository}: {e}")
+            return []
 
     def get_registry_tags(self, image: str) -> List[str]:
-        """Get tags from Docker registry using Docker SDK"""
-        try:
-            repository, _ = image.split(":")
-            tags = self.client.tags(repository)
-            return tags
-        except docker.errors.APIError as e:
-            logger.warning(f"Failed to fetch tags for {image}: {e}")
+        """Get tags from appropriate registry"""
+        if image.startswith("ghcr.io/"):
+            logger.warning(f"GHCR tag fetching not implemented for {image}")
             return []
+        else:
+            return self.get_dockerhub_tags(image)
 
 
 class DockerImageUpdater:
@@ -96,7 +90,7 @@ class DockerImageUpdater:
         self.allow_major = allow_major
         self.registry = DockerRegistry()
 
-        # Patterns to skip (typically latest tags or non-semantic versions)
+        # Patterns to skip
         self.skip_patterns = [
             "latest",
             "stable",
@@ -119,21 +113,13 @@ class DockerImageUpdater:
 
     def _load_yaml(self) -> dict:
         """Load YAML configuration file"""
-        try:
-            with open(self.vars_file, "r") as f:
-                return yaml.safe_load(f)
-        except Exception as e:
-            logger.error(f"Failed to load {self.vars_file}: {e}")
-            raise
+        with open(self.vars_file, "r") as f:
+            return yaml.safe_load(f)
 
     def _save_yaml(self, data: dict) -> None:
         """Save YAML configuration file"""
-        try:
-            with open(self.vars_file, "w") as f:
-                yaml.dump(data, f, default_flow_style=False, sort_keys=False, indent=2)
-        except Exception as e:
-            logger.error(f"Failed to save {self.vars_file}: {e}")
-            raise
+        with open(self.vars_file, "w") as f:
+            yaml.dump(data, f, default_flow_style=False, sort_keys=False, indent=2)
 
     def _create_backup(self) -> Path:
         """Create backup of the variables file"""
@@ -141,67 +127,73 @@ class DockerImageUpdater:
         backup_path = (
             self.vars_file.parent / f"{self.vars_file.name}.backup.{timestamp}"
         )
-
-        try:
-            backup_path.write_text(self.vars_file.read_text())
-            logger.info(f"Backup created: {backup_path}")
-            return backup_path
-        except Exception as e:
-            logger.error(f"Failed to create backup: {e}")
-            raise
+        backup_path.write_text(self.vars_file.read_text())
+        logger.info(f"Backup created: {backup_path}")
+        return backup_path
 
     def _flatten_docker_images(
         self, docker_images: dict, prefix: str = ""
     ) -> Dict[str, str]:
         """Flatten nested docker_images dictionary"""
         flattened = {}
-
         for key, value in docker_images.items():
             full_key = f"{prefix}.{key}" if prefix else key
-
             if isinstance(value, dict):
                 flattened.update(self._flatten_docker_images(value, full_key))
             elif isinstance(value, str) and ":" in value:
                 flattened[full_key] = value
-
         return flattened
 
     def _update_nested_dict(self, data: dict, key_path: str, new_value: str) -> None:
         """Update nested dictionary value using dot notation key path"""
         keys = key_path.split(".")
         current = data["docker_images"]
-
         for key in keys[:-1]:
-            if key not in current:
-                current[key] = {}
             current = current[key]
-
         current[keys[-1]] = new_value
 
     def _find_latest_compatible_version(
         self, current_version: str, available_tags: List[str]
-    ) -> Optional[SemanticVersion]:
+    ) -> Optional[str]:
         """Find the latest compatible version from available tags"""
         try:
-            current_semver = SemanticVersion(current_version)
-        except ValueError:
+            current_clean = current_version.lstrip("v")
+            if not semver.VersionInfo.isvalid(current_clean):
+                logger.warning(f"Current version is not semantic: {current_version}")
+                return None
+            current_semver = semver.VersionInfo.parse(current_clean)
+        except Exception:
             logger.warning(f"Current version is not semantic: {current_version}")
             return None
 
         latest_compatible = None
+        latest_semver = None
 
         for tag in available_tags:
             if self._should_skip_tag(tag):
                 continue
 
             try:
-                tag_semver = SemanticVersion(tag)
+                tag_clean = tag.lstrip("v")
+                if not semver.VersionInfo.isvalid(tag_clean):
+                    continue
+                tag_semver = semver.VersionInfo.parse(tag_clean)
 
-                if tag_semver.is_compatible_update(current_semver, self.allow_major):
-                    if latest_compatible is None or tag_semver > latest_compatible:
-                        latest_compatible = tag_semver
-            except ValueError:
-                continue  # Skip invalid semantic versions
+                # Check if it's a compatible update
+                if tag_semver <= current_semver:
+                    continue
+
+                # Check major version compatibility
+                if tag_semver.major > current_semver.major and not self.allow_major:
+                    continue
+
+                # Check if it's the latest compatible version
+                if latest_semver is None or tag_semver > latest_semver:
+                    latest_compatible = tag
+                    latest_semver = tag_semver
+
+            except Exception:
+                continue
 
         return latest_compatible
 
@@ -225,7 +217,6 @@ class DockerImageUpdater:
 
         # Get available tags from registry
         available_tags = self.registry.get_registry_tags(repository)
-
         if not available_tags:
             logger.warning(f"No tags found for {repository}")
             return None
@@ -235,33 +226,40 @@ class DockerImageUpdater:
             current_tag, available_tags
         )
 
-        if latest_version and str(latest_version) != current_tag:
+        if latest_version and latest_version != current_tag:
             logger.info(
                 f"Update available for {image_key}: {current_tag} -> {latest_version}"
             )
-            return (current_tag, str(latest_version))
+            return (current_tag, latest_version)
 
         return None
 
-    def update_all_images(self) -> Dict[str, object]:
+    def update_all_images(self) -> Dict[str, int]:
         """Check and update all Docker images"""
         logger.info("Starting Docker image update check...")
 
         # Load current configuration
-        data = self._load_yaml()
-        docker_images = data.get("docker_images", {})
+        try:
+            data = self._load_yaml()
+        except Exception as e:
+            logger.error(f"Failed to load {self.vars_file}: {e}")
+            raise
 
+        docker_images = data.get("docker_images", {})
         if not docker_images:
             logger.warning("No docker_images section found in configuration")
-            return {"updates": 0, "errors": 0}
+            return {"updates": 0, "errors": 0, "checked": 0}
 
         # Create backup if not dry run
         if not self.dry_run:
-            self._create_backup()
+            try:
+                self._create_backup()
+            except Exception as e:
+                logger.error(f"Failed to create backup: {e}")
+                raise
 
         # Flatten nested structure
         flattened_images = self._flatten_docker_images(docker_images)
-
         logger.info(f"Found {len(flattened_images)} Docker images to check")
 
         updates_made = 0
@@ -275,7 +273,8 @@ class DockerImageUpdater:
 
                     if self.dry_run:
                         logger.info(
-                            f"[DRY RUN] Would update {image_key}: {old_version} -> {new_version}"
+                            f"[DRY RUN] Would update {image_key}: "
+                            f"{old_version} -> {new_version}"
                         )
                     else:
                         # Update the nested structure
@@ -302,8 +301,12 @@ class DockerImageUpdater:
 
         # Save updated configuration
         if updates_made > 0 and not self.dry_run:
-            self._save_yaml(data)
-            logger.info(f"Configuration updated with {updates_made} image updates")
+            try:
+                self._save_yaml(data)
+                logger.info(f"Configuration updated with {updates_made} image updates")
+            except Exception as e:
+                logger.error(f"Failed to save {self.vars_file}: {e}")
+                raise
 
         return {
             "updates": updates_made,
@@ -311,21 +314,24 @@ class DockerImageUpdater:
             "checked": len(flattened_images),
         }
 
-    def print_summary(self, results: Dict[str, object]) -> None:
+    def print_summary(self, results: Dict[str, int]) -> None:
         """Print summary of update results"""
         print("\n" + "=" * 60)
         print("Docker Image Update Summary")
         print("=" * 60)
 
         print(f"Images checked: {results['checked']}")
-        print(f"Updates {'found' if self.dry_run else 'applied'}: {results['updates']}")
+        status = "found" if self.dry_run else "applied"
+        print(f"Updates {status}: {results['updates']}")
         print(f"Errors: {results['errors']}")
 
         if self.updates_found:
-            print(f"\n{'Available updates:' if self.dry_run else 'Applied updates:'}")
+            header = "Available updates:" if self.dry_run else "Applied updates:"
+            print(f"\n{header}")
             for update in self.updates_found:
                 print(
-                    f"  • {update['key']}: {update['old_version']} -> {update['new_version']}"
+                    f"  • {update['key']}: "
+                    f"{update['old_version']} -> {update['new_version']}"
                 )
 
         if self.errors:
@@ -338,7 +344,8 @@ class DockerImageUpdater:
                 print("\nRun without --dry-run to apply these updates")
             else:
                 print(
-                    "\nReview changes and run 'make deploy-all' to deploy updated images"
+                    "\nReview changes and run 'make deploy-all' "
+                    "to deploy updated images"
                 )
         else:
             print("\nAll images are up to date!")
@@ -346,13 +353,13 @@ class DockerImageUpdater:
 
 def main():
     parser = argparse.ArgumentParser(
-        description=("Check and update Docker image versions using semantic versioning")
+        description="Check and update Docker image versions using semantic versioning"
     )
     parser.add_argument(
         "--vars-file",
         type=Path,
-        default=Path("group_vars/myhosts.yaml"),
-        help="Path to the variables file (default: group_vars/myhosts.yaml)",
+        default=Path("host_vars/central/main.yaml"),
+        help="Path to the variables file",
     )
     parser.add_argument(
         "--dry-run",
@@ -389,24 +396,19 @@ def main():
         sys.exit(0)
 
     # Create updater and run
-    vars_file = args.vars_file
     updater = DockerImageUpdater(
-        vars_file=vars_file, dry_run=args.dry_run, allow_major=args.allow_major
+        vars_file=args.vars_file, dry_run=args.dry_run, allow_major=args.allow_major
     )
 
     try:
         results = updater.update_all_images()
         updater.print_summary(results)
 
-        # Exit with error code if there were errors
         if results["errors"] > 0:
             sys.exit(1)
 
-    except KeyboardInterrupt:
-        logger.info("Update check interrupted by user")
-        sys.exit(1)
     except Exception as e:
-        logger.error(f"Update check failed: {e}")
+        logger.error(f"Script failed: {e}")
         sys.exit(1)
 
 
