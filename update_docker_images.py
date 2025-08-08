@@ -358,7 +358,7 @@ def main():
     parser.add_argument(
         "--vars-file",
         type=Path,
-        default=Path("host_vars/central/main.yaml"),
+        default=Path("group_vars/myhosts.yaml"),
         help="Path to the variables file",
     )
     parser.add_argument(
