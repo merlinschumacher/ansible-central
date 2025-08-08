@@ -1,5 +1,23 @@
 ---
+# Base directory configuration
 homarr_base_folder: "{{ docker_base_folder }}/homarr"
 homarr_data_folder: "{{ homarr_base_folder }}/data"
-homarr_puid: 1000
-homarr_pgid: 1000
+
+# User management
+homarr_user: "homarr"
+homarr_group: "homarr"
+homarr_create_user: true
+
+# File permissions
+homarr_file_permissions:
+  directories: "0755"
+  configs: "0644"
+  data: "0755"
+
+# Service configuration
+homarr_backup_configs: true
+homarr_restart_policy: "unless-stopped"
+
+# Docker configuration
+homarr_pull_policy: "missing"
+homarr_remove_orphans: true

@@ -1,4 +1,21 @@
 ---
+- name: Restart Traefik container
+  community.docker.docker_compose_v2:
+    project_src: "{{ traefik_base_folder }}"
+    state: present
+    pull: "{{ traefik_pull_policy }}"
+    recreate: "always"
+    remove_orphans: true
+  listen: restart_traefik
+
+- name: Reload Traefik configuration
+  community.docker.docker_compose_v2:
+    project_src: "{{ traefik_base_folder }}"
+    state: present
+    recreate: "auto"
+  listen: reload_traefik
+
+# Legacy handler for compatibility
 - name: Create traefik container
   community.docker.docker_compose_v2:
     project_src: "{{ traefik_base_folder }}"

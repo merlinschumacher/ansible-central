@@ -1,7 +1,7 @@
 services:
   jellyplex-watched:
     hostname: jellyplex-watched
-    image: luigi311/jellyplex-watched:latest
+    image: {{ docker_images.jellyplex_watched }}
     container_name: jellyplex-watched
     restart: unless-stopped
     environment:

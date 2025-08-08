@@ -1,8 +1,28 @@
 ---
+# Base directory configuration
 borgwarehouse_base_folder: "{{ docker_base_folder }}/borgwarehouse"
+
+# User management
+borgwarehouse_user: "borgwarehouse"
+borgwarehouse_group: "borgwarehouse"
+borgwarehouse_create_user: true
+
+# File permissions
+borgwarehouse_file_permissions:
+  directories: "0755"
+  configs: "0644"
+  data: "0755"
+
+# Service configuration
+borgwarehouse_backup_configs: true
+borgwarehouse_restart_policy: "unless-stopped"
+
+# Docker configuration
+borgwarehouse_pull_policy: "missing"
+borgwarehouse_remove_orphans: true
+
+# Email configuration
 borgwarehouse_email_port: "{{ mailserver_port }}"
 borgwarehouse_email_host: "{{ mailserver_hostname }}"
 borgwarehouse_email_username: "{{ mailserver_username }}"
 borgwarehouse_email_from: "{{ mailserver_username }}"
-borgwarehouse_uid: 1001
-borgwarehouse_gid: 1001

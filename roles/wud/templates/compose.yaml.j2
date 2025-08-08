@@ -1,6 +1,6 @@
 services:
-  whatsupdocker:
-    image: getwud/wud
+  wud:
+    image: {{ docker_images.wud }}
     container_name: wud
     networks:
       - {{ docker_proxy_network }}

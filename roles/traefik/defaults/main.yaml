@@ -1,2 +1,27 @@
 ---
+# Traefik configuration defaults
 traefik_base_folder: "{{ docker_base_folder }}/traefik"
+
+# Configuration management
+traefik_backup_configs: true
+traefik_validate_configs: true
+
+# Service configuration
+traefik_restart_policy: "unless-stopped"
+traefik_log_level: "INFO"
+
+# Security settings
+traefik_file_permissions:
+  configs: "0640"
+  directories: "0750"
+  secrets: "0600"
+
+# Docker image configuration
+traefik_image: "{{ docker_images.traefik }}"
+traefik_pull_policy: "missing"
+
+# Network configuration
+traefik_create_networks: true
+traefik_networks:
+  - "{{ docker_proxy_network }}"
+  - "{{ docker_proxy_security_network }}"

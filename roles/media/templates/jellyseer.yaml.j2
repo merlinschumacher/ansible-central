@@ -1,6 +1,6 @@
 services:
   jellyseerr:
-    image: fallenbagel/jellyseerr:latest
+    image: {{ docker_images.jellyseer }}
     container_name: jellyseerr
     env_file: {{ media_base_folder }}/jellyseer.env
     volumes:

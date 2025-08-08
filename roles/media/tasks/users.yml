@@ -1,0 +1,62 @@
+---
+# User and group management for media services
+- name: Ensure media group exists
+  ansible.builtin.group:
+    name: "{{ media_group }}"
+    system: true
+    state: present
+  when: media_create_user
+
+- name: Ensure media user exists
+  ansible.builtin.user:
+    name: "{{ media_user }}"
+    group: "{{ media_group }}"
+    system: true
+    home: "{{ media_user_home }}"
+    create_home: false
+    shell: "/usr/sbin/nologin"
+    state: present
+  register: media_user_info
+  when: media_create_user
+
+- name: Get media user information
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ media_user }}"
+  register: media_user_lookup
+
+- name: Set media user facts
+  ansible.builtin.set_fact:
+    media_uid: "{{ media_user_lookup.ansible_facts.getent_passwd[media_user][1] }}"
+    media_gid: "{{ media_user_lookup.ansible_facts.getent_passwd[media_user][2] }}"
+
+- name: Get system groups for hardware acceleration
+  ansible.builtin.getent:
+    database: group
+  register: system_groups
+
+- name: Set hardware acceleration group facts
+  ansible.builtin.set_fact:
+    video_group_id: "{{ system_groups.ansible_facts.getent_group['video'][1] if 'video' in system_groups.ansible_facts.getent_group else omit }}"
+    render_group_id: "{{ system_groups.ansible_facts.getent_group['render'][1] if 'render' in system_groups.ansible_facts.getent_group else omit }}"
+  when: media_enable_hardware_acceleration
+
+- name: Add media user to video group
+  ansible.builtin.user:
+    name: "{{ media_user }}"
+    groups: video
+    append: true
+  when:
+    - media_enable_hardware_acceleration
+    - video_group_id is defined
+    - media_video_group_required
+
+- name: Add media user to render group
+  ansible.builtin.user:
+    name: "{{ media_user }}"
+    groups: render
+    append: true
+  when:
+    - media_enable_hardware_acceleration
+    - render_group_id is defined
+    - media_render_group_required

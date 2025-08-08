@@ -1,6 +1,27 @@
 ---
+# Base directory configuration
 crowdsec_base_folder: "{{ docker_base_folder }}/crowdsec"
-crowdsec_gid: 1001
+
+# User management
+crowdsec_user: "crowdsec"
+crowdsec_group: "crowdsec"
+crowdsec_create_user: true
+
+# File permissions
+crowdsec_file_permissions:
+  directories: "0755"
+  configs: "0644"
+  data: "0755"
+
+# Service configuration
+crowdsec_backup_configs: true
+crowdsec_restart_policy: "unless-stopped"
+
+# Docker configuration
+crowdsec_pull_policy: "missing"
+crowdsec_remove_orphans: true
+
+# CrowdSec collections to install
 crowdsec_collections_list:
   - crowdsecurity/sshd
   - crowdsecurity/sshd-impossible-travel

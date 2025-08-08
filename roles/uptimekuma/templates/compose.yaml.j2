@@ -1,5 +1,7 @@
----
-services:
+-services:
+  uptime-kuma:
+    image: {{ docker_images.uptime_kuma }}
+    container_name: uptime-kumaervices:
   uptimekuma:
     image: louislam/uptime-kuma:1
     container_name: uptimekuma
@@ -21,7 +23,7 @@ services:
       - traefik.http.routers.uptimekuma.middlewares={{ docker_traefik_auth_middleware }},{{ docker_traefik_lan_middleware }}
 
   dockerproxy:
-    image: wollomatic/socket-proxy:1 
+    image: {{ docker_images.socket_proxy }}
     container_name: dockerproxy
     command:
       - '-loglevel=info' # set to debug for far more logging

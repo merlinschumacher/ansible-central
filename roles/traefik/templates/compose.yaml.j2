@@ -2,7 +2,7 @@
 ---
 services:
   proxy:
-    image: traefik:v3
+    image: {{ docker_images.traefik }}
     hostname: proxy
     container_name: proxy
     restart: always

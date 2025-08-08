@@ -1,2 +1,27 @@
 ---
+# Base directory configuration
 uptimekuma_base_folder: "{{ docker_base_folder }}/uptimekuma"
+uptimekuma_data_folder: "{{ uptimekuma_base_folder }}/data"
+
+# User management
+uptimekuma_user: "uptimekuma"
+uptimekuma_group: "uptimekuma"
+uptimekuma_create_user: true
+
+# File permissions
+uptimekuma_file_permissions:
+  directories: "0755"
+  configs: "0644"
+  data: "0755"
+
+# Service configuration
+uptimekuma_backup_configs: true
+uptimekuma_restart_policy: "unless-stopped"
+
+# Docker configuration
+uptimekuma_pull_policy: "missing"
+uptimekuma_remove_orphans: true
+
+# Socket proxy configuration
+uptimekuma_socket_proxy_enabled: true
+uptimekuma_socket_proxy_log_level: "info"

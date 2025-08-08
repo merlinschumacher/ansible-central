@@ -1,109 +1,183 @@
 ---
-- name: Central Setup
+#
+# Central Server Deployment Playbook
+# This playbook deploys a complete Docker-based service stack including:
+# - Reverse proxy (Traefik)
+# - Authentication (Authentik)
+# - Security (CrowdSec)
+# - Media services (Jellyfin, Jellyseer)
+# - Backup (Borg, BorgWarehouse)
+# - Monitoring (UptimeKuma, WUD)
+#
+- name: Deploy Central Server Infrastructure
   hosts: myhosts
   become: true
+  gather_facts: true
+
+  # Global variables for the deployment
   vars:
-    docker_base_folder: /docker
-    docker_proxy_network: "proxy"
-    docker_proxy_security_network: "proxysec"
-    docker_traefik_https_endpoint: "web-secure"
-    docker_traefik_auth_middleware: "proxyauth"
-    docker_traefik_lan_middleware: "lan-whitelist@file"
-    mosquitto_mqtt_port: "1883/tcp"
-    mosquitto_mqttsecure_port: "8883/tcp"
-    authentik_docker_tag: "2025.6"
+    # Dynamic Traefik entrypoints (host-specific)
     docker_traefik_entrypoints:
       borgwarehousessh: "{{ borgwarehouse_ssh_port }}"
       mqtt: "{{ mosquitto_mqtt_port }}"
       mqttsecure: "{{ mosquitto_mqttsecure_port }}"
 
-  roles:
-    - role: hifis.toolkit.unattended_upgrades
-      tags:
-        - never
-        - system-configuration
-    - role: idiv_biodiversity.systemd.systemd_timesyncd
-      tags:
-        - never
-        - system-configuration
-      vars:
-        systemd_timesyncd_ntp_servers:
-          - 0.de.pool.ntp.org
-          - 1.de.pool.ntp.org
-          - 2.de.pool.ntp.org
-          - 3.de.pool.ntp.org
-        systemd_timesyncd_remove_legacy_packages: true
-    - role: geerlingguy.docker
-      tags:
-        - never
-        - system-configuration
-    - role: networking
-      tags:
-        - never
-        - networking
-        - system-configuration
-    - role: mivek.inadyn
-      tags:
-        - never
-        - inadyn
-        - networking
-        - system-configuration
-    - role: traefik
-      tags:
-        - services
-        - traefik
-    - role: authentik
-      tags:
-        - services
-        - authentik
-    - role: crowdsec
-      tags:
-        - services
-        - crowdsec
-    - role: borgwarehouse
-      tags:
-        - services
-        - borgwarehouse
-        - backup
-    - role: borg
-      tags:
-        - services
-        - borg
-        - backup
-    - role: media
-      tags:
-        - services
-        - media
-    - role: uptimekuma
-      tags:
-        - services
-        - uptimekuma
-    - role: wud
-      tags:
-        - services
-        - wud
+  # Pre-deployment tasks
   pre_tasks:
-    - name: Install base packages
+    - name: Install base system packages
       ansible.builtin.apt:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - gnupg
-          - lsb-release
-          - python3-yaml
+        name: "{{ base_packages }}"
         state: present
+        update_cache: true
       tags:
-        - never
         - system-configuration
+        - packages
 
-    - name: Create docker data folder
+    - name: Create Docker data directory
       ansible.builtin.file:
-        path: /docker/
+        path: "{{ docker_base_folder }}"
         state: directory
         owner: root
         group: root
         mode: "0755"
       tags:
-        - never
         - system-configuration
+        - directories
+
+    - name: Verify system readiness
+      ansible.builtin.debug:
+        msg: "System is ready for service deployment on {{ inventory_hostname }}"
+      tags:
+        - system-configuration
+
+  # System configuration roles
+  tasks:
+    - name: Configure system-level components
+      tags:
+        - system-configuration
+      when: configure_system | default(false)
+      block:
+        - name: Apply unattended upgrades configuration
+          ansible.builtin.include_role:
+            name: hifis.toolkit.unattended_upgrades
+          tags:
+            - unattended-upgrades
+
+        - name: Configure time synchronization
+          ansible.builtin.include_role:
+            name: idiv_biodiversity.systemd.systemd_timesyncd
+          vars:
+            systemd_timesyncd_ntp_servers: "{{ ntp_servers }}"
+            systemd_timesyncd_remove_legacy_packages: true
+          tags:
+            - time-sync
+
+        - name: Install and configure Docker
+          ansible.builtin.include_role:
+            name: geerlingguy.docker
+          tags:
+            - docker
+
+        - name: Configure networking
+          ansible.builtin.include_role:
+            name: networking
+          tags:
+            - networking
+
+        - name: Configure dynamic DNS
+          ansible.builtin.include_role:
+            name: mivek.inadyn
+          tags:
+            - dyndns
+
+    - name: Deploy infrastructure services
+      tags:
+        - infrastructure
+        - services
+      block:
+        - name: Deploy Traefik reverse proxy
+          ansible.builtin.include_role:
+            name: traefik
+          tags:
+            - traefik
+            - proxy
+
+        - name: Deploy Authentik authentication
+          ansible.builtin.include_role:
+            name: authentik
+          tags:
+            - authentik
+            - authentication
+
+        - name: Deploy CrowdSec security
+          ansible.builtin.include_role:
+            name: crowdsec
+          tags:
+            - crowdsec
+            - security
+
+    - name: Deploy backup services
+      tags:
+        - backup
+        - services
+      block:
+        - name: Deploy BorgWarehouse backup server
+          ansible.builtin.include_role:
+            name: borgwarehouse
+          tags:
+            - borgwarehouse
+
+        - name: Configure Borg backup client
+          ansible.builtin.include_role:
+            name: borg
+          tags:
+            - borg
+
+    - name: Deploy application services
+      tags:
+        - applications
+        - services
+      block:
+        - name: Deploy media services stack
+          ansible.builtin.include_role:
+            name: media
+          tags:
+            - media
+            - jellyfin
+            - jellyseer
+
+        - name: Deploy monitoring services
+          tags:
+            - monitoring
+          block:
+            - name: Deploy UptimeKuma monitoring
+              ansible.builtin.include_role:
+                name: uptimekuma
+              tags:
+                - uptimekuma
+
+            - name: Deploy WUD update detector
+              ansible.builtin.include_role:
+                name: wud
+              tags:
+                - wud
+
+  # Post-deployment tasks
+  post_tasks:
+    - name: Verify service deployment
+      ansible.builtin.debug:
+        msg: "All services have been deployed successfully on {{ inventory_hostname }}"
+      tags:
+        - verification
+
+    - name: Display service URLs
+      ansible.builtin.debug:
+        msg: |
+          Services are available at:
+          - Traefik Dashboard: https://{{ ansible_host }}/dashboard/
+          - Authentik: https://{{ ansible_host }}/auth/
+          - UptimeKuma: https://{{ ansible_host }}/uptime/
+          - Media Services: https://{{ ansible_host }}/media/
+      tags:
+        - verification
+        - info

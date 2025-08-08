@@ -1,0 +1,32 @@
+---
+galaxy_info:
+  role_name: media
+  description: Deploy media services stack including Jellyfin, Jellyseer, and Jellyplex-watched
+  author: merlinschumacher
+  company: Personal
+  license: MIT
+  min_ansible_version: "2.12"
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+
+  galaxy_tags:
+    - docker
+    - media
+    - jellyfin
+    - jellyseer
+    - plex
+    - streaming
+
+dependencies:
+  - role: community.docker
+    when: ansible_os_family == "Debian"
+
+allow_duplicates: false

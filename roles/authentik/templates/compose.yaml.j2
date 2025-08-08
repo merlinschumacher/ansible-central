@@ -1,7 +1,7 @@
 ---
 services:
   postgresql:
-    image: docker.io/library/postgres:16-alpine
+    image: {{ docker_images.postgres }}
     restart: always
     env_file: "{{ authentik_base_folder }}/postgres.env"
     healthcheck:
@@ -14,7 +14,7 @@ services:
       - {{ authentik_base_folder }}/data/postgresql:/var/lib/postgresql/data
 
   redis:
-    image: docker.io/library/redis:alpine
+    image: {{ docker_images.redis }}
     command: --save 60 1 --loglevel warning
     restart: always
     healthcheck:
@@ -27,7 +27,7 @@ services:
       - {{ authentik_base_folder }}/data/redis:/data
 
   server:
-    image: {{ authentik_docker_image }}:{{ authentik_docker_tag }}
+    image: {{ docker_images.authentik.server }}
     restart: always
     command: server
     volumes:
@@ -60,7 +60,7 @@ services:
         condition: service_healthy
 
   worker:
-    image: {{ authentik_docker_image }}:{{ authentik_docker_tag }}
+    image: {{ docker_images.authentik.server }}
     restart: always
     command: worker
     volumes:
@@ -80,7 +80,7 @@ services:
   ldap:
     container_name: authentik-ldap
     restart: always
-    image: ghcr.io/goauthentik/ldap:{{ authentik_docker_tag }}
+    image: {{ docker_images.authentik.ldap }}
     # Optionally specify which networks the container should be
     # might be needed to reach the core authentik server
     networks:

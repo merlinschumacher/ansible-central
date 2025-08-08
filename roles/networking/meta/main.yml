@@ -1,0 +1,27 @@
+---
+galaxy_info:
+  role_name: networking
+  description: Configure networking including WireGuard VPN
+  author: merlinschumacher
+  company: Personal
+  license: MIT
+  min_ansible_version: "2.12"
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+
+  galaxy_tags:
+    - networking
+    - wireguard
+    - vpn
+
+dependencies: []
+
+allow_duplicates: false

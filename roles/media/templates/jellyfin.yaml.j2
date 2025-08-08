@@ -1,6 +1,6 @@
 services:
   jellyfin:
-    image: jellyfin/jellyfin
+    image: {{ docker_images.jellyfin }}
     container_name: jellyfin
     hostname: media.{{ ansible_domain}}
     #user: 1000:1000

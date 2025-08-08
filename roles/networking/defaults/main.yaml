@@ -1,5 +1,23 @@
 ---
-networking_wireguard_configuration_directory: /etc/wireguard
-networking_wireguard_private_key_file: "{{ networking_wireguard_configuration_directory }}/{{ ansible_hostname }}.key"
-networking_wireguard_public_key_file: "{{ networking_wireguard_configuration_directory }}/{{ ansible_hostname }}.pub"
-networking_wireguard_preshared_key_file: "{{ networking_wireguard_configuration_directory }}/{{ ansible_hostname }}.psk"
+# WireGuard configuration
+networking_wireguard_config_dir: "/etc/wireguard"
+networking_wireguard_private_key_file: "{{ networking_wireguard_config_dir }}/private.key"
+networking_wireguard_public_key_file: "{{ networking_wireguard_config_dir }}/public.key"
+networking_wireguard_preshared_key_file: "{{ networking_wireguard_config_dir }}/preshared.key"
+
+# Key management
+networking_regenerate_keys: false
+networking_backup_keys: true
+
+# File permissions
+networking_key_permissions: "0600"
+networking_config_permissions: "0644"
+
+# Service configuration
+networking_wireguard_enabled: true
+networking_wireguard_autostart: true
+
+# Required packages
+networking_wireguard_packages:
+  - wireguard
+  - wireguard-tools

@@ -2,7 +2,7 @@
 services:
   borgwarehouse:
     container_name: borgwarehouse
-    image: borgwarehouse/borgwarehouse
+    image: {{ docker_images.borgwarehouse }}
     user: "{{ borgwarehouse_uid }}:{{ borgwarehouse_gid }}"
     restart: always
     networks:

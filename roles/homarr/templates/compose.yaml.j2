@@ -3,7 +3,7 @@ services:
   homarr:
     container_name: homarr
     hostname: homarr
-    image: ghcr.io/homarr-labs/homarr:latest
+    image: {{ docker_images.homarr }}
     restart: always
     security_opt:
       - no-new-privileges=true

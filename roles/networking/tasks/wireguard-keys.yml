@@ -1,0 +1,71 @@
+---
+# WireGuard key management tasks
+- name: Check if WireGuard private key exists
+  ansible.builtin.stat:
+    path: "{{ networking_wireguard_private_key_file }}"
+  register: wg_private_key_stat
+
+- name: Generate WireGuard private key
+  ansible.builtin.command:
+    cmd: "wg genkey"
+  register: wg_private_key_generated
+  changed_when: false
+  no_log: true
+  when: not wg_private_key_stat.stat.exists or networking_regenerate_keys
+
+- name: Save WireGuard private key
+  ansible.builtin.copy:
+    content: "{{ wg_private_key_generated.stdout }}"
+    dest: "{{ networking_wireguard_private_key_file }}"
+    mode: "{{ networking_key_permissions }}"
+    owner: systemd-network
+    group: systemd-network
+    backup: "{{ networking_backup_keys }}"
+  when: wg_private_key_generated is defined and wg_private_key_generated.stdout is defined
+  no_log: true
+
+- name: Read WireGuard private key
+  ansible.builtin.slurp:
+    src: "{{ networking_wireguard_private_key_file }}"
+  register: wg_private_key_content
+  no_log: true
+
+- name: Generate WireGuard public key from private key
+  ansible.builtin.shell:
+    cmd: "set -o pipefail && echo '{{ wg_private_key_content.content | b64decode | trim }}' | wg pubkey"
+  register: wg_public_key_generated
+  changed_when: false
+  no_log: true
+
+- name: Save WireGuard public key
+  ansible.builtin.copy:
+    content: "{{ wg_public_key_generated.stdout }}"
+    dest: "{{ networking_wireguard_public_key_file }}"
+    mode: "{{ networking_config_permissions }}"
+    owner: systemd-network
+    group: systemd-network
+    backup: "{{ networking_backup_keys }}"
+
+- name: Check if preshared key exists
+  ansible.builtin.stat:
+    path: "{{ networking_wireguard_preshared_key_file }}"
+  register: wg_preshared_key_stat
+
+- name: Generate WireGuard preshared key
+  ansible.builtin.command:
+    cmd: "wg genpsk"
+  register: wg_preshared_key_generated
+  changed_when: false
+  no_log: true
+  when: not wg_preshared_key_stat.stat.exists or networking_regenerate_keys
+
+- name: Save WireGuard preshared key
+  ansible.builtin.copy:
+    content: "{{ wg_preshared_key_generated.stdout }}"
+    dest: "{{ networking_wireguard_preshared_key_file }}"
+    mode: "{{ networking_key_permissions }}"
+    owner: systemd-network
+    group: systemd-network
+    backup: "{{ networking_backup_keys }}"
+  when: wg_preshared_key_generated is defined and wg_preshared_key_generated.stdout is defined
+  no_log: true

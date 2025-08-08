@@ -1,0 +1,33 @@
+---
+galaxy_info:
+  role_name: authentik
+  description: Deploy Authentik identity provider with PostgreSQL and Redis using Docker Compose
+  author: merlinschumacher
+  company: Personal
+  license: MIT
+  min_ansible_version: "2.12"
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+
+  galaxy_tags:
+    - docker
+    - authentication
+    - identity
+    - sso
+    - oauth
+    - ldap
+    - security
+
+dependencies:
+  - role: community.docker
+    when: ansible_os_family == "Debian"
+
+allow_duplicates: false

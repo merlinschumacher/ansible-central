@@ -1,0 +1,32 @@
+---
+galaxy_info:
+  role_name: homarr
+  description: Deploy Homarr dashboard for homelab service management
+  author: merlinschumacher
+  company: Personal
+  license: MIT
+  min_ansible_version: "2.12"
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+
+  galaxy_tags:
+    - docker
+    - dashboard
+    - homelab
+    - monitoring
+    - interface
+    - management
+
+dependencies:
+  - role: community.docker
+    when: ansible_os_family == "Debian"
+
+allow_duplicates: false

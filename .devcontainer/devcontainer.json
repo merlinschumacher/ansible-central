@@ -18,7 +18,13 @@
         "ms-azuretools.vscode-docker",
         "foxundermoon.shell-format",
         "tamasfe.even-better-toml",
-        "samuelcolvin.jinjahtml"
+        "samuelcolvin.jinjahtml",
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "ms-python.isort",
+        "ms-python.flake8",
+        "esbenp.prettier-vscode",
+        "editorconfig.editorconfig"
       ]
     }
   },

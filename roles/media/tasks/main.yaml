@@ -1,15 +1,37 @@
 ---
+- name: Setup media users and groups
+  ansible.builtin.include_tasks: users.yml
+  tags:
+    - media
+    - users
+
 - name: Include Gluetun tasks
   ansible.builtin.include_tasks: 00-gluetun.yaml
+  tags:
+    - media
+    - gluetun
+    - vpn
 
 - name: Include Jellyfin tasks
   ansible.builtin.include_tasks: 10-jellyfin.yaml
+  tags:
+    - media
+    - jellyfin
 
 - name: Include JellyPlex Watched tasks
   ansible.builtin.include_tasks: 20-jellyplex-watched.yaml
+  tags:
+    - media
+    - jellyplex
 
 - name: Include Jellyseer tasks
   ansible.builtin.include_tasks: 30-jellyseer.yaml
+  tags:
+    - media
+    - jellyseer
 
 - name: Include Compose tasks
   ansible.builtin.include_tasks: 90-compose.yaml
+  tags:
+    - media
+    - compose

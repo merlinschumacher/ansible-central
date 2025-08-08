@@ -1,0 +1,29 @@
+---
+galaxy_info:
+  role_name: borg
+  description: Deploy and configure BorgBackup client for automated backups
+  author: merlinschumacher
+  company: Personal
+  license: MIT
+  min_ansible_version: "2.12"
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+
+  galaxy_tags:
+    - backup
+    - borgbackup
+    - encryption
+    - deduplication
+    - automation
+
+dependencies: []
+
+allow_duplicates: false

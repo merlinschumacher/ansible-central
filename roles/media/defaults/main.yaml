@@ -1,6 +1,34 @@
 ---
+# Base directory configuration
 media_base_folder: "{{ docker_base_folder }}/media"
 media_data: "{{ media_base_folder }}/data"
+
+# Service-specific directories
 media_jellyseer_base_folder: "{{ media_data }}/jellyseer"
 media_jellyfin_base_folder: "{{ media_data }}/jellyfin"
 media_gluetun_base_folder: "{{ media_data }}/gluetun"
+
+# User management
+media_user: "media"
+media_group: "media"
+media_create_user: true
+media_user_home: "{{ media_base_folder }}"
+
+# File permissions
+media_file_permissions:
+  directories: "0755"
+  configs: "0644"
+  data: "0755"
+
+# Service configuration
+media_backup_configs: true
+media_restart_policy: "unless-stopped"
+
+# Docker configuration
+media_pull_policy: "missing"
+media_remove_orphans: true
+
+# Video/render groups (for hardware acceleration)
+media_enable_hardware_acceleration: true
+media_video_group_required: true
+media_render_group_required: true

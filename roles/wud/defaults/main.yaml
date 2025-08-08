@@ -1,3 +1,27 @@
 ---
+# Base directory configuration
 wud_base_folder: "{{ docker_base_folder }}/wud"
 wud_data_folder: "{{ wud_base_folder }}/data"
+
+# User management
+wud_user: "wud"
+wud_group: "wud"
+wud_create_user: true
+
+# File permissions
+wud_file_permissions:
+  directories: "0755"
+  configs: "0644"
+  data: "0755"
+
+# Service configuration
+wud_backup_configs: true
+wud_restart_policy: "unless-stopped"
+
+# Docker configuration
+wud_pull_policy: "missing"
+wud_remove_orphans: true
+
+# WUD-specific configuration
+wud_log_level: "info"
+wud_cron_schedule: "0 */6 * * *"  # Every 6 hours

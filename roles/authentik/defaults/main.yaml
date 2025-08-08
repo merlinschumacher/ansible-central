@@ -2,7 +2,11 @@
 authentik_base_folder: "{{ docker_base_folder }}/authentik"
 authentik_postgres_user: "authentik"
 authentik_postgres_db: "authentik"
-authentik_docker_image: "ghcr.io/goauthentik/server"
+
+# Docker image configuration (using centralized versions)
+authentik_docker_image: "{{ docker_images.authentik.server.split(':')[0] }}"
+authentik_docker_tag: "{{ docker_images.authentik.server.split(':')[1] }}"
+
 authentik_error_reporting_enabled: false
 authentik_email_port: "{{ mailserver_port }}"
 authentik_email_host: "{{ mailserver_hostname }}"
