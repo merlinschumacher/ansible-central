@@ -3,7 +3,7 @@ services:
   borgwarehouse:
     container_name: borgwarehouse
     image: {{ docker_images.borgwarehouse }}
-    user: "{{ borgwarehouse_uid }}:{{ borgwarehouse_gid }}"
+    user: "{{ borgwarehouse_user }}:{{ borgwarehouse_group }}"
     restart: always
     networks:
       - {{ docker_proxy_network }}
@@ -19,9 +19,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.borgwarehouse.rule=(Host(`backup.msch.cc`))
       - traefik.http.services.borgwarehouse.loadbalancer.server.port=3000
-      - traefik.http.routers.borgwarehouse.entrypoints={{ docker_traefik_https_endpoint }}
+      - traefik.http.routers.borgwarehouse.entrypoints={{ traefik_https_endpoint }}
       - traefik.http.routers.borgwarehouse.service=borgwarehouse
-      - traefik.http.routers.borgwarehouse.middlewares={{ docker_traefik_lan_middleware }}
+      - traefik.http.routers.borgwarehouse.middlewares={{ traefik_lan_middleware }}
       - traefik.tcp.routers.borgwarehousessh.rule=HostSNI(`*`)
       - traefik.tcp.routers.borgwarehousessh.service=borgwarehousessh
       - traefik.tcp.services.borgwarehousessh.loadbalancer.server.port=22

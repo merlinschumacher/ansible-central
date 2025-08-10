@@ -13,6 +13,9 @@ crowdsec_file_permissions:
   configs: "0644"
   data: "0755"
 
+crowdsec_uid: 1001
+crowdsec_gid: 1001
+
 # Service configuration
 crowdsec_backup_configs: true
 crowdsec_restart_policy: "unless-stopped"

@@ -1,9 +1,6 @@
--services:
-  uptime-kuma:
-    image: {{ docker_images.uptime_kuma }}
-    container_name: uptime-kumaervices:
+services:
   uptimekuma:
-    image: louislam/uptime-kuma:1
+    image: {{ docker_images.uptime_kuma }}
     container_name: uptimekuma
     restart: always
     security_opt:
@@ -19,8 +16,8 @@
       - traefik.enable=true
       - traefik.http.services.uptimekuma.loadbalancer.server.port=3001
       - traefik.http.routers.uptimekuma.rule=Host(`uptime.{{ ansible_domain }}`)
-      - traefik.http.routers.uptimekuma.entrypoints={{ docker_traefik_https_endpoint }}
-      - traefik.http.routers.uptimekuma.middlewares={{ docker_traefik_auth_middleware }},{{ docker_traefik_lan_middleware }}
+      - traefik.http.routers.uptimekuma.entrypoints={{ traefik_https_endpoint }}
+      - traefik.http.routers.uptimekuma.middlewares={{ traefik_auth_middleware }},{{ traefik_lan_middleware }}
 
   dockerproxy:
     image: {{ docker_images.socket_proxy }}

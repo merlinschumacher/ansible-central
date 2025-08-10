@@ -1,6 +1,24 @@
 ---
-- name: Create media containers
+- name: Restart media container
   community.docker.docker_compose_v2:
     project_src: "{{ media_base_folder }}"
     state: present
+    pull: "{{ media_pull_policy }}"
+    recreate: "always"
+    remove_orphans: true
+  listen: restart_media
+
+- name: Reload media configuration
+  community.docker.docker_compose_v2:
+    project_src: "{{ media_base_folder }}"
+    state: present
+    recreate: "auto"
+  listen: reload_media
+
+# Legacy handler for compatibility
+- name: Create media container
+  community.docker.docker_compose_v2:
+    project_src: "{{ media_base_folder }}"
+    state: present
+    recreate: "always"
   listen: media-recreate

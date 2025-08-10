@@ -23,7 +23,7 @@
 
 - name: Secure ACME directory permissions
   ansible.builtin.file:
-    name: "{{ traefik_base_folder }}/data/acme"
+    name: "{{ traefik_base_folder }}/data/config/acme"
     state: directory
     owner: root
     group: root

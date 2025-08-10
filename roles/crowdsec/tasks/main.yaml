@@ -35,7 +35,7 @@
   ansible.builtin.file:
     name: "{{ crowdsec_base_folder }}/data/db"
     state: directory
-    owner: 1000
+    owner: "{{ crowdsec_uid }}"
     group: "{{ crowdsec_gid }}"
     mode: "0750"
 
@@ -43,7 +43,7 @@
   ansible.builtin.file:
     name: "{{ crowdsec_base_folder }}/data/config"
     state: directory
-    owner: 1000
+    owner: "{{ crowdsec_uid }}"
     group: "{{ crowdsec_gid }}"
     mode: "0750"
 

@@ -3,6 +3,7 @@ roles:
   - geerlingguy.docker
   - aruhier.systemd_networkd
   - mivek.inadyn
+  - singleplatform-eng.users
 
 collections:
   - community.general

@@ -44,13 +44,13 @@ inadyn_providers:
     hostname: "{{ cf_dyndns_hostname2 }}"
     checkip_server: "dns64.cloudflare-dns.com"
     checkip_path: "/cdn-cgi/trace"
-docker_traefik_proxy_network_addresses:
+traefik_proxy_network_addresses:
   ipv4_address: "172.18.128.2"
   ipv6_address: "fd3c:3065:18::1:2"
-docker_traefik_proxy_security_network_addresses:
+traefik_proxy_security_network_addresses:
   ipv4_address: "172.19.128.2"
   ipv6_address: "fd3c:3065:19::1:2"
-docker_traefik_lan_ip_allowlist:
+traefik_lan_ip_allowlist:
   # Docker internal ranges
   - "127.0.0.1/32"
   - "172.0.0.0/8"

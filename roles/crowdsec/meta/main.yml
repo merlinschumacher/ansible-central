@@ -26,8 +26,4 @@ galaxy_info:
     - crowdsec
     - firewall
 
-dependencies:
-  - role: community.docker
-    when: ansible_os_family == "Debian"
-
 allow_duplicates: false

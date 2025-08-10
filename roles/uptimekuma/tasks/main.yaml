@@ -7,6 +7,17 @@
   ansible.builtin.set_fact:
     docker_group: "{{ ansible_facts.getent_group['docker'][1] }}"
 
+- name: Create uptimekuma user
+  ansible.builtin.include_role:
+    name: singleplatform-eng.users
+  vars:
+    users:
+      - username: "{{ uptimekuma_user }}"
+        users_create_per_user_group: true
+        shell: /bin/false
+        create_home: false
+        system: true
+
 - name: Create  uptimekuma base folder
   ansible.builtin.file:
     name: "{{ uptimekuma_base_folder }}"
@@ -19,8 +30,8 @@
   ansible.builtin.file:
     name: "{{ uptimekuma_base_folder }}/data/uptimekuma"
     state: directory
-    owner: "1001"
-    group: "1001"
+    owner: "uptimekuma"
+    group: "uptimekuma"
     mode: "0750"
 
 - name: Create uptimekuma files from templates

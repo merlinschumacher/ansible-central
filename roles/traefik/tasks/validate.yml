@@ -7,8 +7,8 @@
       - docker_base_folder | length > 0
       - docker_proxy_network is defined
       - docker_proxy_security_network is defined
-      - docker_traefik_proxy_network_addresses is defined
-      - docker_traefik_proxy_security_network_addresses is defined
+      - traefik_proxy_network_addresses is defined
+      - traefik_proxy_security_network_addresses is defined
     fail_msg: "Required Traefik variables are missing or invalid"
     quiet: true
 
@@ -26,7 +26,7 @@
 - name: Validate network addresses format
   ansible.builtin.assert:
     that:
-      - docker_traefik_proxy_network_addresses.ipv4_address is match("^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$")
+      - traefik_proxy_network_addresses.ipv4_address is match("^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$")
     fail_msg: "Invalid IPv4 address format in network configuration"
     quiet: true
-  when: docker_traefik_proxy_network_addresses.ipv4_address is defined
+  when: traefik_proxy_network_addresses.ipv4_address is defined

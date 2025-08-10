@@ -18,6 +18,18 @@
     - "{{ media_jellyfin_base_folder }}/config"
     - "{{ media_jellyfin_base_folder }}/cache"
 
+- name: Get user id for video group
+  ansible.builtin.getent:
+    database: group
+
+- name: Get id for video group
+  ansible.builtin.set_fact:
+    video_group: "{{ ansible_facts.getent_group['video'][1] }}"
+
+- name: Get id for render group
+  ansible.builtin.set_fact:
+    render_group: "{{ ansible_facts.getent_group['render'][1] }}"
+
 - name: Create Jellyfin configuration from template
   ansible.builtin.template:
     src: "{{ item.src }}"
@@ -28,30 +40,9 @@
     backup: "{{ media_backup_configs }}"
   loop:
     - src: "jellyfin-config.json.j2"
-      dest: "{{ media_jellyfin_base_folder }}/config/system.xml"
+      dest: "{{ media_jellyfin_base_folder }}/config.json"
     - src: "jellyfin.env.j2"
-      dest: "{{ media_jellyfin_base_folder }}/jellyfin.env"
+      dest: "{{ media_base_folder }}/jellyfin.env"
     - src: "jellyfin.yaml.j2"
-      dest: "{{ media_jellyfin_base_folder }}/jellyfin.yaml"
-  notify: restart_media_services
-
-- name: Create Jellyfin compose file from template
-  ansible.builtin.template:
-    src: "{{ item }}"
-    dest: "{{ media_base_folder }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
-    mode: "0640"
-  with_items:
-    - "jellyfin.yaml.j2"
-    - "jellyfin.env.j2"
-  notify:
-    - media-recreate
-
-- name: Create Jellyfin config.json from template
-  ansible.builtin.template:
-    src: "jellyfin-config.json.j2"
-    dest: "{{ media_jellyfin_base_folder }}/config.json"
-    owner: 1000
-    group: 1000
-    mode: "0600"
-  notify:
-    - media-recreate
+      dest: "{{ media_base_folder }}/jellyfin.yaml"
+  notify: restart_media

@@ -1,9 +1,20 @@
+- name: Create borgwarehouse user
+  ansible.builtin.include_role:
+    name: singleplatform-eng.users
+  vars:
+    users:
+      - username: "{{ borgwarehouse_user }}"
+        users_create_per_user_group: true
+        shell: /bin/false
+        create_home: false
+        system: true
+
 - name: Create borgwarehouse folders
   ansible.builtin.file:
     name: "{{ borgwarehouse_base_folder }}/{{ item }}"
     state: directory
-    owner: "1001"
-    group: "1001"
+    owner: "{{ borgwarehouse_user }}"
+    group: "{{ borgwarehouse_group }}"
     mode: "0750"
     force: false
   with_items:
@@ -19,8 +30,8 @@
   ansible.builtin.file:
     name: "{{ borgwarehouse_base_folder }}/{{ item }}"
     state: directory
-    owner: "1001"
-    group: "1001"
+    owner: "{{ borgwarehouse_user }}"
+    group: "{{ borgwarehouse_group }}"
     mode: "0700"
     force: false
   with_items:
@@ -45,7 +56,7 @@
     minute: "*/30"
     user: "nobody"
     job: "curl --request POST --url 'https://backup.{{ ansible_domain }}/api/cronjob/checkStatus' \
-     --header 'Authorization: Bearer {{ borgwarehouse_cronjob_key }}'; \
-     curl --request POST --url 'https://backup.{{ ansible_domain }}/api/cronjob/getStorageUsed' \
-     --header 'Authorization: Bearer {{ borgwarehouse_cronjob_key }}'"
+      --header 'Authorization: Bearer {{ borgwarehouse_cronjob_key }}'; \
+      curl --request POST --url 'https://backup.{{ ansible_domain }}/api/cronjob/getStorageUsed' \
+      --header 'Authorization: Bearer {{ borgwarehouse_cronjob_key }}'"
     cron_file: borgwarehouse

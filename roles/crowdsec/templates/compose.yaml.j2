@@ -22,6 +22,12 @@ services:
       - "{{ traefik_base_folder }}/data/logs:/logs/traefik:ro"
       - "/var/log/journal:/run/log/journal:ro"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider --quiet --tries=1 --timeout=5 http://127.0.0.1:8080/health > /dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 volumes:
   logs:
     external: true

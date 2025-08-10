@@ -12,6 +12,6 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jellyseerr.rule=Host(`requests.{{ ansible_domain }}`)"
-      - "traefik.http.routers.jellyseerr.entrypoints={{ docker_traefik_https_endpoint }}"
+      - "traefik.http.routers.jellyseerr.entrypoints={{ traefik_https_endpoint }}"
       - "traefik.http.services.jellyseerr.loadbalancer.server.port=5055"
-      - "traefik.http.routers.jellyseerr.middlewares={{ docker_traefik_lan_middleware }}"
+      - "traefik.http.routers.jellyseerr.middlewares={{ traefik_lan_middleware }}"

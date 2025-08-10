@@ -17,7 +17,7 @@
   # Global variables for the deployment
   vars:
     # Dynamic Traefik entrypoints (host-specific)
-    docker_traefik_entrypoints:
+    traefik_entrypoints:
       borgwarehousessh: "{{ borgwarehouse_ssh_port }}"
       mqtt: "{{ mosquitto_mqtt_port }}"
       mqttsecure: "{{ mosquitto_mqttsecure_port }}"

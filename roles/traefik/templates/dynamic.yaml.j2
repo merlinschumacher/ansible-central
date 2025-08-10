@@ -31,11 +31,11 @@ http:
     https-redirect:
       redirectScheme:
         scheme: https
-    {{ docker_traefik_lan_middleware | split('@') | first }}:
+    {{ traefik_lan_middleware | split('@') | first }}:
       ipAllowList:
         rejectStatusCode: 404
-        sourceRange: 
-        {{ docker_traefik_lan_ip_allowlist | to_nice_yaml(indent=2) | indent(8) }}
+        sourceRange:
+        {{ traefik_lan_ip_allowlist | to_nice_yaml(indent=2) | indent(8) }}
     crowdsec-bouncer:
         plugin:
             crowdsec-bouncer-traefik-plugin:

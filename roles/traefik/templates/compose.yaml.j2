@@ -11,17 +11,17 @@ services:
     networks:
       default:
       {{ docker_proxy_network }}:
-        ipv4_address: {{ docker_traefik_proxy_network_addresses["ipv4_address"] }}
-        ipv6_address: {{ docker_traefik_proxy_network_addresses["ipv6_address"] }}
+        ipv4_address: {{ traefik_proxy_network_addresses["ipv4_address"] }}
+        ipv6_address: {{ traefik_proxy_network_addresses["ipv6_address"] }}
       {{ docker_proxy_security_network }}:
-        ipv4_address: {{ docker_traefik_proxy_security_network_addresses["ipv4_address"] }}
-        ipv6_address: {{ docker_traefik_proxy_security_network_addresses["ipv6_address"] }}
+        ipv4_address: {{ traefik_proxy_security_network_addresses["ipv4_address"] }}
+        ipv6_address: {{ traefik_proxy_security_network_addresses["ipv6_address"] }}
     ports:
       - 80:80
       - 443:443/tcp
       - 443:443/udp
-{% for entrypoint in docker_traefik_entrypoints %}
-      - {{ docker_traefik_entrypoints[entrypoint] | split('/') | first }}:{{ docker_traefik_entrypoints[entrypoint] }}
+{% for entrypoint in traefik_entrypoints %}
+      - {{ traefik_entrypoints[entrypoint] | split('/') | first }}:{{ traefik_entrypoints[entrypoint] }}
 {% endfor %}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -32,11 +32,13 @@ services:
     labels:
       - 'wud.watch.digest=true'
       - 'traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)'
-      - 'traefik.http.routers.api.service=api@internal' 
+      - 'traefik.http.routers.api.service=api@internal'
       - 'traefik.http.routers.api.rule=Host(`traefik.{{ ansible_domain }}`)'
-      - 'traefik.http.routers.api.entrypoints={{ docker_traefik_https_endpoint }}'
+      - 'traefik.http.routers.api.entrypoints={{ traefik_https_endpoint }}'
       - 'traefik.http.services.api.loadBalancer.server.port=8080'
-      - 'traefik.http.routers.api.middlewares={{ docker_traefik_lan_middleware }}, {{ docker_traefik_auth_middleware }}'
+      - 'traefik.http.routers.api.middlewares={{ traefik_lan_middleware }}, {{ traefik_auth_middleware }}'
+    healthcheck:
+      test: 'traefik healthcheck'
 
   whoami:
     image: traefik/whoami
@@ -48,7 +50,7 @@ services:
       - traefik.docker.network=traefik_default
       - traefik.http.routers.whoami.rule=Host(`test.{{ ansible_domain }}`)
       - traefik.http.services.whoami.loadBalancer.server.port=80
-      - traefik.http.routers.whoami.middlewares={{ docker_traefik_lan_middleware }}
+      - traefik.http.routers.whoami.middlewares={{ traefik_lan_middleware }}
 
 networks:
   default:

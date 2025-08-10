@@ -10,9 +10,9 @@ services:
       timeout: 10s
       retries: 3
     restart: always
-    group_add: 
-      - '{{ video_group[0] }}' 
-      - '{{ render_group[0] }}' 
+    group_add:
+      - '{{ video_group[0] }}'
+      - '{{ render_group[0] }}'
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
       - /dev/dri/card0:/dev/dri/card0
@@ -36,8 +36,8 @@ services:
       - 'traefik.enable=true'
       - 'wud.tag.include=latest'
       - 'wud.watch.digest=true'
-      - 'traefik.http.routers.jellyfin.entryPoints={{ docker_traefik_https_endpoint }}'
-      - 'traefik.http.routers.jellyfin.rule=Host(`media.{{ ansible_domain }}`)' 
+      - 'traefik.http.routers.jellyfin.entryPoints={{ traefik_https_endpoint }}'
+      - 'traefik.http.routers.jellyfin.rule=Host(`media.{{ ansible_domain }}`)'
       - 'traefik.http.routers.jellyfin.middlewares=jellyfin-mw'
       - 'traefik.http.routers.jellyfin.service=jellyfin'
       - 'traefik.http.services.jellyfin.loadBalancer.server.port=8096'
@@ -52,7 +52,7 @@ services:
       - 'traefik.http.middlewares.jellyfin-mw.headers.STSPreload=true'
       - 'traefik.http.middlewares.jellyfin-mw.headers.forceSTSHeader=true'
       - 'traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true'
-      - 'traefik.http.middlewares.jellyfin-mw.headers.referrerPolicy=strict-origin-when-cross-origin' 
+      - 'traefik.http.middlewares.jellyfin-mw.headers.referrerPolicy=strict-origin-when-cross-origin'
       # Disabled due to WebOS issue: https://github.com/jellyfin/jellyfin-webos/issues/294
       #- 'traefik.http.middlewares.jellyfin-mw.headers.browserXssFilter=true'
       #- 'traefik.http.middlewares.jellyfin-mw.headers.frameDeny=true'
