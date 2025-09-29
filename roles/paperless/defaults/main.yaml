@@ -1,0 +1,5 @@
+---
+paperless_base_folder: "{{ docker_base_folder }}/paperless"
+paperless_data_folder: "{{ paperless_base_folder }}/data/paperless"
+paperless_db_folder: "{{ paperless_base_folder }}/data/postgres"
+paperless_redis_folder: "{{ paperless_base_folder }}/data/redis"

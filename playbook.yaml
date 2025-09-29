@@ -146,6 +146,12 @@
             - jellyfin
             - jellyseer
 
+        - name: Deploy paperless services stack
+          ansible.builtin.include_role:
+            name: paperless
+          tags:
+            - paperless
+
         - name: Deploy monitoring services
           tags:
             - monitoring

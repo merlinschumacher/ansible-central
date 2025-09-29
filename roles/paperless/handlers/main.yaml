@@ -1,0 +1,7 @@
+---
+- name: Create paperless container
+  community.docker.docker_compose_v2:
+    project_src: "{{ paperless_base_folder }}"
+    state: present
+    recreate: "always"
+  listen: paperless-recreate
