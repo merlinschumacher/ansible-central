@@ -62,7 +62,8 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.paperless.rule=Host(`paperless.{{ ansible_domain }}`)'
-      - 'traefik.http.routers.jellyfin.entryPoints={{ traefik_https_endpoint }}'
+      - 'traefik.http.routers.paperless.entryPoints={{ traefik_https_endpoint }}'
+      - 'traefik.http.routers.paperless.middlewares={{ traefik_lan_middleware }}'
       - 'traefik.http.services.paperless.loadbalancer.server.port=8000'
   gotenberg:
     image: docker.io/gotenberg/gotenberg:8.22
