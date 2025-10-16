@@ -24,5 +24,6 @@ galaxy_info:
     - jellyseer
     - plex
     - streaming
+    - qbittorrent
 
 allow_duplicates: false

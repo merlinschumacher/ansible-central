@@ -145,6 +145,8 @@
             - media
             - jellyfin
             - jellyseer
+            - qbittorrent
+            - gluetun
 
         - name: Deploy paperless services stack
           ansible.builtin.include_role:

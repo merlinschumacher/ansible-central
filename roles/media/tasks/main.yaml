@@ -30,6 +30,12 @@
     - media
     - jellyseer
 
+- name: Include qbittorrent tasks
+  ansible.builtin.include_tasks: 40-qbittorrent.yaml
+  tags:
+    - media
+    - qbittorrent
+
 - name: Include Compose tasks
   ansible.builtin.include_tasks: 90-compose.yaml
   tags:

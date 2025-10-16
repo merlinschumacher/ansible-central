@@ -1,0 +1,20 @@
+---
+- name: Create qbittorrent config folder
+  ansible.builtin.file:
+    name: "{{ media_qbittorrent_base_folder }}"
+    state: directory
+    owner: 1000
+    group: 1000
+    mode: "0700"
+    force: false
+
+- name: Create qbittorrent compose files from template
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ media_base_folder }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
+    mode: "0640"
+  with_items:
+    - "qbittorrent.yaml.j2"
+    - "qbittorrent.env.j2"
+  notify:
+    - media-recreate

@@ -1,0 +1,20 @@
+---
+services:
+  qbittorrent:
+    tmpfs:
+      - /run:uid=1000,gid=1000,exec
+    security_opt:
+      - no-new-privileges=true
+    read_only: true
+    network_mode: "service:gluetun"
+    user: 1000:1000
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    volumes:
+      - /srv/temp/Eingang/:/downloads
+      - {{ media_qbittorrent_base_folder }}:/config
+    env_file:
+      - {{ media_base_folder }}/qbittorrent.env
+    restart: unless-stopped
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0

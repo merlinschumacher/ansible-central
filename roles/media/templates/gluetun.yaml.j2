@@ -15,3 +15,9 @@ services:
       - {{ media_base_folder }}/gluetun.env
     networks:
       - {{ docker_proxy_network }}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.client.loadbalancer.server.port=8090"
+      - "traefik.http.routers.client.EntryPoints={{ traefik_https_endpoint }}"
+      - "traefik.http.routers.client.rule=(Host(`torrent.{{ ansible_domain }}`))"
+      - "traefik.http.routers.client.middlewares=lan-whitelist@file, proxyauth@docker"
